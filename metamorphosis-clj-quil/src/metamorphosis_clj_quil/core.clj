@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 ; (use 'metamorphosis_clj_quil :reload-all true) to run processing sketch in REPL
 
-=======
->>>>>>> 5588efaeaeb26379633434d12b6b2cce17eb9b24
 (ns metamorphosis-clj-quil.core
   (:require [quil.core :as q]
             [quil.middleware :as m]))
