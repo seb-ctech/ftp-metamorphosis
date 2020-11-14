@@ -1,27 +1,9 @@
-#clojure project
-
-metamorphosis-clj/target
-metamorphosis-clj/classes
-metamorphosis-clj/checkouts
-metamorphosis-clj/profiles.clj
-metamorphosis-clj/pom.xml
-metamorphosis-clj/pom.xml.asc
-metamorphosis-clj/*.jar
-metamorphosis-clj/*.class
-metamorphosis-clj/.lein-*
-metamorphosis-clj/.nrepl-port
-metamorphosis-clj/.prepl-port
-metamorphosis-clj/.hgignore
-metamorphosis-clj/.hg/
-
-#clojure quil project
-
-metamorphosis-clj-quil/target
-metamorphosis-clj-quil/classes
-metamorphosis-clj-quil/checkouts
-metamorphosis-clj-quil/pom.xml
-metamorphosis-clj-quil/pom.xml.asc
-metamorphosis-clj-quil/*.jar
-metamorphosis-clj-quil/*.class
-metamorphosis-clj-quil/.lein-*
-metamorphosis-clj-quil/.nrepl-port
+/target
+/classes
+/checkouts
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port

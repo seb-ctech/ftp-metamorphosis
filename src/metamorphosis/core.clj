@@ -1,6 +1,4 @@
-; (use 'metamorphosis_clj_quil :reload-all true) to run processing sketch in REPL
-
-(ns metamorphosis-clj-quil.core
+(ns metamorphosis.core
   (:require [quil.core :as q]
             [quil.middleware :as m]))
 
@@ -35,7 +33,7 @@
       (q/ellipse x y 100 100))))
 
 
-(q/defsketch metamorphosis-clj-quil
+(q/defsketch metamorphosis
   :title "You spin my circle right round"
   :size [500 500]
   ; setup function called only once, during sketch initialization.
