@@ -14,24 +14,24 @@
 
 (defn update-state [state]
   ; Update sketch state by changing circle color and position.
-  {:color (mod (+ (:color state) 0.7) 255)
-   :angle (+ (:angle state) 0.1)})
+ )
 
 (defn draw-state [state]
-  ; Clear the sketch by filling it with light-grey color.
-  (q/background 240)
-  ; Set circle color.
-  (q/fill (:color state) 255 255)
-  ; Calculate x and y coordinates of the circle.
-  (let [angle (:angle state)
-        x (* 150 (q/cos angle))
-        y (* 150 (q/sin angle))]
-    ; Move origin point to the center of the sketch.
-    (q/with-translation [(/ (q/width) 2)
-                         (/ (q/height) 2)]
-      ; Draw the circle.
-      (q/ellipse x y 100 100))))
+  (q/with-translation [(/ (q/width) 2) (/ (q/height) 2)]
+    (let [t (/ (q/frame-count) 10)]
+      (q/line (f t) 
+              (f (+ t 0.1))))))
 
+(defn draw-plot [f from to step]
+  (doseq [two-points (->> (range from to step)
+                          (map f)
+                          (partition 2 1))]
+      (apply q/line two-points)))
+
+(defn f [t]
+  (let [r (* 200 (q/sin (+ t 1)) (q/cos t))]
+    [(* r (q/sin (* t 0.2)))
+      (* r (q/cos (* t 0.2)))]))
 
 (q/defsketch metamorphosis
   :title "You spin my circle right round"

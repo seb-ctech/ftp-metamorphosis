@@ -8,9 +8,11 @@ LightTable - open `core.clj` and press `Ctrl+Shift+Enter` to evaluate the file.
 
 Emacs - run cider, open `core.clj` and press `C-c C-k` to evaluate the file.
 
-REPL - run `(require 'metamorphosis.core)`.
+REPL - run `(require 'metamorphosis.core :reload-all)`.
 
-(use 'metamorphosis_clj_quil :reload-all true)
+Then "eval and show result" the "draw-state" function.
+
+(use 'metamorphosis.core :reload-all true)
 
 ## License
 
