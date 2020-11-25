@@ -3,7 +3,6 @@
 
 ;TODO: Implement overall-architecture
 
-(defn -main []
-  (g/metamorph))
-
-(-main)
+(defn -main [& args]
+  (g/metamorph)
+  (println args))

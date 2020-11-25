@@ -13,6 +13,7 @@ REPL - run `(require 'metamorphosis.core :reload-all)`.
 Then "eval and show result" the "draw-state" function.
 
 (use 'metamorphosis.core :reload-all true)
+(clojure.main/main "-m" 'metamorphosis.core)
 
 ## License
 
