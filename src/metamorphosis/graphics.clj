@@ -2,7 +2,7 @@
     (:require [quil.core :as q]
               [quil.middleware :as m]
               [metamorphosis.l-system :as ls]
-              [metamorphosis.examples :as ex]))
+              [test.examples :as ex]))
 
 ;TODO: Find visual translation made out of composable functions that is fitting for a beginning motif. Ideally 3D
 
@@ -39,7 +39,7 @@
 
 ; Main Entry point for Quil Sketches
 ; 1. Main Metamorphosis visuals
-(def metamorph '(q/defsketch metamorphosis
+(defn metamorph [] (q/defsketch metamorphosis
     :title "Metamorphosis"
     :size [500 500]
     ; setup function called only once, during sketch initialization.
@@ -52,7 +52,3 @@
     ; Check quil wiki for more info about middlewares and particularly
     ; fun-mode.
     :middleware [m/fun-mode]))
-
-(defn start 
-    ([] (eval metamorph))
-    ([sketch] (eval sketch)))

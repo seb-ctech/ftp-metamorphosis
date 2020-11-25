@@ -1,8 +1,8 @@
-(ns metamorphosis.examples.tree
+(ns examples.tree
     (:require [quil.core :as q :include-macros true]
               [quil.middleware :as m]))
   
-  
+
   (def initial-angle q/HALF-PI)
   (def grow-speed 1)
   (def length-coef [0.7 1])

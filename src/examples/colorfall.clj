@@ -1,4 +1,4 @@
-(ns metamorphosis.examples.colorfall
+(ns examples.colorfall
     (:require [quil.core :as q :include-macros true]))
   
   ;;;
@@ -6,6 +6,8 @@
   ;;; http://hamoid.com
   ;;;
   
+(def a 3)
+
   (defn setup []
     (q/frame-rate 60)
     (q/color-mode :hsb 1)

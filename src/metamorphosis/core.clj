@@ -4,6 +4,6 @@
 ;TODO: Implement overall-architecture
 
 (defn -main []
-  (g/start))
+  (g/metamorph))
 
 (-main)

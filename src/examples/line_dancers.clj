@@ -1,4 +1,4 @@
-(ns metamorphosis.examples.line_dancers
+(ns examples.line_dancers
     (:require [quil.core :as q :include-macros true]
     ))
   
