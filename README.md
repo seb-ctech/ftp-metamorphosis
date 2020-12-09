@@ -4,16 +4,12 @@ A Quil sketch designed to ... well, that part is up to you.
 
 ## Usage
 
-LightTable - open `core.clj` and press `Ctrl+Shift+Enter` to evaluate the file.
+1. REPL - run `(require 'metamorphosis.core :reload-all)`.
+    - Then "eval and show result" the "draw-state" function.
 
-Emacs - run cider, open `core.clj` and press `C-c C-k` to evaluate the file.
+2. (use 'metamorphosis.core :reload-all true)
 
-REPL - run `(require 'metamorphosis.core :reload-all)`.
-
-Then "eval and show result" the "draw-state" function.
-
-(use 'metamorphosis.core :reload-all true)
-(clojure.main/main "-m" 'metamorphosis.core)
+3. (clojure.main/main "-m" 'metamorphosis.core)
 
 ## License
 

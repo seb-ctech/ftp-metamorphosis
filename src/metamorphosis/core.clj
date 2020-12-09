@@ -6,3 +6,5 @@
 (defn -main [& args]
   (g/metamorph)
   (println args))
+
+(-main)
