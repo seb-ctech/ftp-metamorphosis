@@ -1,9 +1,9 @@
 (ns test.exercises
     (:require [quil.core :as q]
               [quil.middleware :as m]
-              [examples.sketch :as simple]
-              [examples.recursion :as rec]
-              [examples.glsl-parsing :as glsl]))
+              [exercises.sketch :as simple]
+              [exercises.recursion :as rec]
+              [exercises.glsl-parsing :as glsl]))
 
 (defn test-ns [] (ns-aliases *ns*))
 
@@ -13,8 +13,8 @@
 (defn simple-sketch [] (q/defsketch simplesketch
     :host "host"
      :size [500 500]
-     :setup s/setup
-     :draw s/draw))
+     :setup simple/setup
+     :draw simple/draw))
 
 (defn recursive-piece [] (q/defsketch recursion
     :host "host"
@@ -31,4 +31,6 @@
     :update glsl/update
     :draw glsl/draw))
 
-(defn run-example [] (cfall))
+(defn run-exercise [e] (e))
+
+(run-exercise simple-sketch)

@@ -32,4 +32,6 @@
     :setup colorf/setup
     :draw colorf/draw))
 
-(defn run-example [] (cfall))
+(defn run-example [s] (s))
+
+(run-example cfall)
