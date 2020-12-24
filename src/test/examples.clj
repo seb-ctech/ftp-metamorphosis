@@ -32,6 +32,8 @@
     :setup colorf/setup
     :draw colorf/draw))
 
-(defn run-example [s] (s))
+(defn run-example
+    ([] (rtree)) 
+    ([s] (s)))
 
-(run-example cfall)
+(run-example)
