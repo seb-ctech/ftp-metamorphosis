@@ -33,7 +33,7 @@
     :draw colorf/draw))
 
 (defn run-example
-    ([] (rtree)) 
+    ([] (cfall)) 
     ([s] (s)))
 
 (run-example)

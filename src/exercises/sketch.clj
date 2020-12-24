@@ -2,7 +2,7 @@
 (ns exercises.sketch
     (:require [quil.core :as q :include-macros true]))
 
-(def number-of-cells 10)
+(def number-of-cells 3)
 
 (defn generate-grid []
     (let [cell-size (/ (q/width) number-of-cells)]
@@ -13,7 +13,8 @@
                   top-right {:x next-x :y y}
                   bottom-left {:x x :y next-y}
                   bottom-right {:x next-x :y next-y}
-                  cell {:top-left top-left :top-right top-right :bottom-left bottom-left :bottom-right bottom-right}
+                  flipped (< (Math/random) 0.5)
+                  cell {:top-left top-left :top-right top-right :bottom-left bottom-left :bottom-right bottom-right :flipped? flipped}
                   new-cells (conj cells cell)]
                 (if (< next-x (q/width))
                     (recur new-cells next-x y)
@@ -21,14 +22,15 @@
                         (recur new-cells 0 next-y)
                         new-cells))))))
 
-(defn draw-diagonal [corners flipped?]
-    (if flipped?
-        (q/line (:bottom-left corners) (:top-right corners))
-        (q/line (:top-left corners) (:bottom-right corners))))
+(defn draw-diagonal [cell]
+    (if (:flipped? cell)
+        (q/line (:x (:bottom-left cell)) (:y (:bottom-left cell)) (:x (:top-right cell)) (:y (:top-right cell)))
+        (q/line (:x (:top-left cell)) (:y (:top-left cell)) (:x (:bottom-right cell)) (:y (:bottom-right cell)))))
 
 (defn setup []
     {:cells (generate-grid)})
 
 (defn draw-state [state]
+    (q/background 255)
     (doseq [cell (:cells state)]
-        (draw-diagonal cell (< (Math/random) 0.5))))
+        (draw-diagonal cell)))
