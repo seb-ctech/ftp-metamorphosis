@@ -13,8 +13,9 @@
         (q/dist (:x p1) (:y p1) (:x p2) (:y p2))))
 
 (defn get-inset-corner [outer-corner center ratio]
-    (let [offset-x (* (- (:x outer-corner) (:x center)) ratio)
-          offset-y (* (- (:y outer-corner) (:y center)) ratio)]
+    (let [r (Math/random)
+          offset-x (* (- (:x outer-corner) (:x center)) ratio r)
+          offset-y (* (- (:y outer-corner) (:y center)) ratio r)]
         {:x (+ (:x center) offset-x)
          :y (+ (:y center) offset-y)}))
 
@@ -29,17 +30,26 @@
             (apply q/quad points))
         inner-quad))
 
-(defn draw-quad-ception [x y]
-    (loop [outer-quad (initial-quad)]
+(defn draw-quad-ception [x y increment]
+    (println increment)
+    (loop [outer-quad (initial-quad)
+          opacity 0]
+        (q/stroke 255 (min opacity 255))
         (when (>= (get-quad-size outer-quad) 2) 
-            (recur (draw-nested-quad outer-quad {:x x :y y} (- 1 nested-ratio))))))
+            (recur (draw-nested-quad outer-quad {:x x :y y} (- 1 nested-ratio)) (+ opacity increment)))))
 
-(defn setup [])
+(defn setup []
+    {:reach 20})
 
-(defn draw []
+(defn update[state]
+    (if (q/mouse-pressed?)
+        (assoc state :reach (min (+ (:reach state) 0.5) 200))
+        (assoc state :reach (max (- (:reach state) 0.5) 20))))
+
+(defn draw [state]
     (let [x (q/mouse-x)
           y (q/mouse-y)]
         (q/background 20 0 0)
         (q/stroke 255)
         (q/no-fill)
-        (draw-quad-ception x y)))
+        (draw-quad-ception x y (:reach state))))

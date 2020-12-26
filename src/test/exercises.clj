@@ -23,7 +23,9 @@
     :host "host"
     :size [500 500]
     :setup rec/setup
-    :draw rec/draw))
+    :update rec/update
+    :draw rec/draw
+    :middleware [m/fun-mode]))
 
 (defn glsl-piece [] (q/defsketch glslcomposer
     :host "host"
