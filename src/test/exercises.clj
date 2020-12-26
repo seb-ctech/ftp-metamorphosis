@@ -23,9 +23,7 @@
     :host "host"
     :size [500 500]
     :setup rec/setup
-    :update rec/update
-    :draw rec/draw
-    :renderer :p2d))
+    :draw rec/draw))
 
 (defn glsl-piece [] (q/defsketch glslcomposer
     :host "host"
@@ -34,6 +32,9 @@
     :update glsl/update
     :draw glsl/draw))
 
+;FIXME: Java > 9.0 produces an illegal reflective access when using ":renderer p2d".
+; Can't use Shaders or 3D-Renderer for now!
+
 (defn run-exercise [e] (e))
 
-(run-exercise simple-sketch)
+(run-exercise recursive-piece)
