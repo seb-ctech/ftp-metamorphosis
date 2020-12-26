@@ -2,7 +2,7 @@
 (ns exercises.sketch
     (:require [quil.core :as q :include-macros true]))
 
-(def number-of-cells 3)
+(def number-of-cells 5)
 
 (defn generate-grid []
     (let [cell-size (/ (q/width) number-of-cells)]
@@ -27,10 +27,17 @@
         (q/line (:x (:bottom-left cell)) (:y (:bottom-left cell)) (:x (:top-right cell)) (:y (:top-right cell)))
         (q/line (:x (:top-left cell)) (:y (:top-left cell)) (:x (:bottom-right cell)) (:y (:bottom-right cell)))))
 
+;Layer of Abstraction to better control the outcome later
+(defn draw-cell [cell]
+    (draw-diagonal cell))
+
 (defn setup []
     {:cells (generate-grid)})
 
 (defn draw-state [state]
     (q/background 255)
     (doseq [cell (:cells state)]
-        (draw-diagonal cell)))
+        (draw-cell cell)))
+
+(defn mouse-clicked [state]
+    {:cells (generate-grid)})

@@ -15,7 +15,8 @@
      :size [500 500]
      :setup simple/setup
      :draw simple/draw-state
-     :middleware [m/fun-mode]))
+     :middleware [m/fun-mode]
+     :mouse-clicked simple/mouse-clicked))
 
 (defn recursive-piece [] (q/defsketch recursion
     :host "host"
