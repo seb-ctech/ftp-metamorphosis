@@ -43,8 +43,8 @@
 
 (defn update[state]
     (if (q/mouse-pressed?)
-        (assoc state :reach (min (+ (:reach state) 0.5) 200))
-        (assoc state :reach (max (- (:reach state) 0.5) 20))))
+        (assoc state :reach (min (+ (:reach state) 2.5) 200))
+        (assoc state :reach (max (- (:reach state) 5.0) 20))))
 
 (defn draw [state]
     (let [x (q/mouse-x)
