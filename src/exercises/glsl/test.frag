@@ -5,8 +5,12 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-void main(){
+// Created by inigo quilez - iq/2013
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+// http://iquilezles.org/www/articles/voronoise/voronoise.htm
 
-gl_FragColor = vec4(1, 0, 1, 1);
+void main(){
+    
+    gl_FragColor = vec4(1, 1, 1, 1);
 
 }
