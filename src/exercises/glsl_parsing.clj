@@ -1,11 +1,7 @@
 ; 3. Exercise: composing a working glsl piece with two or three layers
-(ns exercises.glsl-parsing
-    (:require [quil.core :as q :include-macros true]))
-
-(defn setup [])
+(ns exercises.glsl-parsing)
 
 (def return-break "\n\n")
-
 (def open-block "{")
 (def close-block "}")
 
@@ -27,14 +23,30 @@
 ; Statements can be: function calls, expressions/operations and assignments;
 (def test-function [
     {:type :parameter, :data-type "int", :name "a"}
-    {:type :return, :statement "v"}
     {:type :declaration, :data-type "int", :name "v"}
-    {:type :control, :statement "if(u_time > 40)"'(
-        {:type :statement, :statement "v = 30 +" {:type :name :index 0} "v = else{<nested2>}"}
-    {:type :statement, :statement }
-    {:type :statement, :statement "v = 20 + <nested1..>"}
-    {:type :call, :statement "add(2, 4)"}
-    {:type :statement, :statement "v = v + <param1>"}])
+    {:type :control, :statement (list 
+        (list "if" {:type :expression :statement "u_time > 50"}) 
+        (list {:type :assignment, :name "v" :statement (list
+            "v +" {:type :name :index 0})}))}
+    {:type :control, :statement (list
+        (list "else") 
+        (list {:type :assignment, :name "v" :statement (list
+                {:type :expression :statement "20 +"} 
+                {:type :call :statement (list "add", 2, 4)})}))}
+    {:type :control, :statement (list
+        (list "for" 
+            {:type :declaration :data-type "int" :name "i" :statement "0" }
+            {:type :statement :statement {:type :expression :statement "i < 50"}}
+            {:type :assignment :name "i" :statement {:type :expression :statement "i + 1"}})
+        {:type :assignment :name "v" :statement "30"})}
+    {:type :return :name "v"}])
+
+(def control-test {:type :control, :statement '(
+    '("for" 
+        {:type :declaration :data-type "int" :name "i" :statement "0" }
+        {:type :statement :statement {:type :expression :statement "i < 50"}}
+        {:type :assignment :name "i" :statement {:type :expression :statement "i + 1"}})
+    {:type :assignment :name "v" :statement "30"})})
 
 (def main-function [
     {:type :statement, :statement "gl_FragColor = <nested1>;"}
@@ -44,26 +56,52 @@
 (defn get-parsed-parameters [statements]
     (let [params (filter #(= (:type %) :parameter) statements)]
         (str "(" (clojure.string/join ", " (map #(str (:data-type %) " " (:name %)) params)) ")")))
-    
-
-;TODO: Find recursive reduction algorithm to compose complex statements
-(defn compose-statements [statements]
-    (let [decs (filter #(= (:type %) :declaration) statements)])
 
 (defn get-return-type [statements]
     (let [type-statements (filter #(or (= (:type %) :declaration) (= (:type %) :parameter)) statements)
-          returned-variable (:statement (first (filter #(= (:type %) :return) statements)))
+          returned-variable (:name (first (filter #(= (:type %) :return) statements)))
           matched-names (filter #(= returned-variable (:name %)) type-statements)]
         (if (> (count matched-names) 0)
             (:data-type (first matched-names))
             "void")))
 
+;TODO: Find recursive reduction algorithm to compose complex statements
+(defn compose-statement [statement]
+    (if (not (string? statement))
+        (if (list? statement)
+            (map compose-statement statement)
+            (case (:type statement)
+                :declaration (str (:data-type statement) " " (:name statement) (if (contains? statement :statement) (str " = " (compose-statement (:statement statement)))) ";")
+                :assignment (str (:name statement) " = " (compose-statement (:statement statement)) ";")
+                :return (str "return" " " (:name statement) ";")
+                :statement (str (compose-statement (:statement statement)) ";")
+                :expression (str (compose-statement (:statement statement)))
+                :call (str (first (:statement statement)) "(" (clojure.string/join ", " (map compose-statement (rest (:statement statement)))) ")")
+                :name (str "|" (:index statement) "|")
+                :control (let [head (first (:statement statement))
+                               body (rest (:statement statement))]
+                            (str (str (first head) "(" (apply str (compose-statement (rest head)) ")")
+                                 (str open-block return-break (compose-statement body) return-break close-block))))
+                "error"))
+        statement
+    ))
+
+(defn compose-statements [statements]
+    (let [valid-types [:assignment :control :call :expression :statement :declaration :return]]
+        (map compose-statement (filter (fn [statement] (some #(= (:type statement) %) valid-types)) statements) )))
+
+(defn replace-parameters [glsl-string statements]
+    (let [parameters (vector (filter #(= (:type %) :parameter) statements))
+         parameter-calls (distinct (re-seq #"\|\d\|" glsl-string))
+         parameter-indexes (map #(re-find #"\d" %) parameter-calls)]
+        (reduce #(clojure.string/replace (re-pattern (str "|" %2 "|")) %1 (:name (get parameters %2))) glsl-string parameter-indexes)))
+
 (defn glsl-function [name statements]
     (let [return-type (get-return-type statements)
           parameter-list (get-parsed-parameters statements)
           composed-statements (compose-statements statements)]
-        (str return-type " " name parameter-list open-block
-            (apply str compose-statements) close-block)))
+        (str return-type " " name parameter-list open-block return-break
+            (replace-parameters (apply str composed-statements) statements) return-break close-block)))
 
 (defn glsl-functions [functions]
     (apply str functions))
@@ -73,3 +111,5 @@
 
 (defn assemble-glsl []
     (str (glsl-prefix)(glsl-functions [test-function])(glsl-main main-function)))
+
+(defn test [] (println (glsl-function "test" test-function)))
