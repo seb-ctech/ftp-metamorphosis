@@ -67,34 +67,33 @@
 
 ;TODO: Find recursive reduction algorithm to compose complex statements
 (defn compose-statement [statement]
-    (if (not (string? statement))
-        (if (list? statement)
-            (reduce #(str %1 (compose-statement %2)) "" statement)
+    (if (list? statement)
+        (reduce #(str %1 (compose-statement %2)) "" statement)
+        (if (map? statement)
             (case (:type statement)
                 :declaration (str (:data-type statement) " " (:name statement) (if (contains? statement :statement) (str " = " (compose-statement (:statement statement)))) ";")
                 :assignment (str (:name statement) " = " (compose-statement (:statement statement)) ";")
-                :return (str "return" " " (:name statement) ";")
+                :return (str "return" " " (compose-statement (:name statement)) ";")
                 :statement (str (compose-statement (:statement statement)) ";")
                 :expression (str (compose-statement (:statement statement)))
                 :call (str (first (:statement statement)) "(" (clojure.string/join ", " (map compose-statement (rest (:statement statement)))) ")")
-                :name (str "|" (:index statement) "|")
+                :name (str "<param" (:index statement) ">")
                 :control (let [head (first (:statement statement))
                                body (rest (:statement statement))]
                             (str (str (first head) "(" (compose-statement (rest head)) ")")
                                  (str open-block return-break (compose-statement body) return-break close-block)))
-                ""))
-        statement
-    ))
+                "")
+            statement)))
 
 (defn compose-statements [statements]
     (let [valid-types [:assignment :control :call :expression :statement :declaration :return]]
         (map compose-statement (filter (fn [statement] (some #(= (:type statement) %) valid-types)) statements) )))
 
 (defn replace-parameters [glsl-string statements]
-    (let [parameters (vector (filter #(= (:type %) :parameter) statements))
-         parameter-calls (distinct (re-seq #"\|\d\|" glsl-string))
-         parameter-indexes (map #(re-find #"\d" %) parameter-calls)]
-        (reduce #(clojure.string/replace (re-pattern (str "|" %2 "|")) %1 (:name (get parameters %2))) glsl-string parameter-indexes)))
+    (let [parameters (into [] (filter #(= (:type %) :parameter) statements))
+         parameter-calls (distinct (re-seq #"<param\d>" glsl-string))
+         parameter-indexes (map #(let [num (Integer/parseInt (re-find #"\d" %))] (list num (:name (get parameters num)))) parameter-calls)]
+        (reduce #(clojure.string/replace %1 (re-pattern (str "<param" (first %2) ">")) (last %2)) glsl-string parameter-indexes)))
 
 (defn glsl-function [name statements]
     (let [return-type (get-return-type statements)
