@@ -1,4 +1,5 @@
 ; 3. Exercise: composing a working glsl piece with two or three layers
+;TODO: Refactor for better readability: decompose nested function compositions by indenting on a new row
 (ns exercises.glsl-parsing)
 
 (def return-break "\n\n")
@@ -14,7 +15,7 @@
          "uniform float u_time;" 
          return-break))
 
-;TODO: implement function to generate a single statement entry
+;TODO: implement function to inject nested functions and derive the necessary data-structure (will build the interface to the l-system)
 ; Transform clojure lisp syntax to GLSL valid syntax: infix operations, function calls with arguments...
 (defn generate-statement [])
 
@@ -68,7 +69,7 @@
             (:data-type (first matched-names))
             "void")))
 
-;TODO: Find recursive reduction algorithm to compose complex statements
+;FIXME: Use "recur" instead of tail call
 (defn compose-statement [statement]
     (if (list? statement)
         (reduce #(str %1 (compose-statement %2)) "" statement)
