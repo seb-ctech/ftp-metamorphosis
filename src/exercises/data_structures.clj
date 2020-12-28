@@ -5,6 +5,20 @@
 (def filename "src/exercises/csv/suspects.csv")
 (def vamp-keys [:name :glitter-index])
 
+(def nested-map {:x {:x1 {:x2 3}}})
+
+(def get-nested-value (comp :x2 :x1 :x))
+
+(def nested-value-plus-3 (comp #(+ 3 %) :x2 :x1 :x))
+
+(defn sleepy-identity
+    [x]
+    (Thread/sleep 1000)
+    x)
+
+; Once it get's evaluated once, it wil save the output for every unique input for successive calls
+(def memo-sleepy-identity (memoize sleepy-identity))
+
 (defn str->int [str]
     (Integer. str))
 
