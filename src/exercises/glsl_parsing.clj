@@ -32,7 +32,7 @@
         (list "else") 
         (list {:type :assignment, :name "v" :statement (list
                 {:type :expression :statement "20 +"} 
-                {:type :call :statement (list "add", 2, 4)})}))}
+                {:type :call :statement (list "add" "2" "4")})}))}
     {:type :control, :statement (list
         (list "for" 
             {:type :declaration :data-type "int" :name "i" :statement "0" }
@@ -41,8 +41,8 @@
         {:type :assignment :name "v" :statement "30"})}
     {:type :return :name "v"}])
 
-(def control-test {:type :control, :statement '(
-    '("for" 
+(def control-test {:type :control, :statement (list
+    (list "for" 
         {:type :declaration :data-type "int" :name "i" :statement "0" }
         {:type :statement :statement {:type :expression :statement "i < 50"}}
         {:type :assignment :name "i" :statement {:type :expression :statement "i + 1"}})
@@ -69,7 +69,7 @@
 (defn compose-statement [statement]
     (if (not (string? statement))
         (if (list? statement)
-            (map compose-statement statement)
+            (reduce #(str %1 (compose-statement %2)) "" statement)
             (case (:type statement)
                 :declaration (str (:data-type statement) " " (:name statement) (if (contains? statement :statement) (str " = " (compose-statement (:statement statement)))) ";")
                 :assignment (str (:name statement) " = " (compose-statement (:statement statement)) ";")
@@ -80,9 +80,9 @@
                 :name (str "|" (:index statement) "|")
                 :control (let [head (first (:statement statement))
                                body (rest (:statement statement))]
-                            (str (str (first head) "(" (apply str (compose-statement (rest head)) ")")
-                                 (str open-block return-break (compose-statement body) return-break close-block))))
-                "error"))
+                            (str (str (first head) "(" (compose-statement (rest head)) ")")
+                                 (str open-block return-break (compose-statement body) return-break close-block)))
+                ""))
         statement
     ))
 
