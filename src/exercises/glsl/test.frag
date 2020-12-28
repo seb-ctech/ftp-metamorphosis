@@ -5,12 +5,21 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-// Created by inigo quilez - iq/2013
-// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
-// http://iquilezles.org/www/articles/voronoise/voronoise.htm
+float a(float a){
 
-void main(){
-    
-    gl_FragColor = vec4(1, 1, 1, 1);
+float v;if(u_time > 50.0){
+v = v +a;
+}else{
+v = 0.2 +step(gl_FragCoord.x, 0.4);
+}for(int i = 0;i < 50;i = i + 1){
+v = 0.3;
+}return v;
 
 }
+
+void main(){
+
+gl_FragColor = vec4(1, 1, 1, 1);
+
+}
+

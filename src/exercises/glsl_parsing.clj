@@ -18,27 +18,28 @@
 ; Transform clojure lisp syntax to GLSL valid syntax: infix operations, function calls with arguments...
 (defn generate-statement [])
 
+;=============== TEST DATA =========================
 
 ;DOC: Trying out a function parsing algorithms with keys that dictate a parsing syntax: :type return, statement, control(nested), declaration, call
 ; Statements can be: function calls, expressions/operations and assignments;
 (def test-function [
-    {:type :parameter, :data-type "int", :name "a"}
-    {:type :declaration, :data-type "int", :name "v"}
+    {:type :parameter, :data-type "float", :name "a"}
+    {:type :declaration, :data-type "float", :name "v"}
     {:type :control, :statement (list 
-        (list "if" {:type :expression :statement "u_time > 50"}) 
-        (list {:type :assignment, :name "v" :statement (list
-            "v +" {:type :name :index 0})}))}
+        (list "if" {:type :expression :statement "u_time > 50.0"}) 
+        (list {:type :statement :statement {:type :assignment, :name "v" :statement (list
+            "v +" {:type :name :index 0})}}))}
     {:type :control, :statement (list
-        (list "else") 
-        (list {:type :assignment, :name "v" :statement (list
-                {:type :expression :statement "20 +"} 
-                {:type :call :statement (list "add" "2" "4")})}))}
+        "else"
+        (list {:type :statement :statement {:type :assignment, :name "v" :statement (list
+                {:type :expression :statement "0.2 +"} 
+                {:type :call :statement (list "step" "gl_FragCoord.x" "0.4")})}}))}
     {:type :control, :statement (list
         (list "for" 
             {:type :declaration :data-type "int" :name "i" :statement "0" }
             {:type :statement :statement {:type :expression :statement "i < 50"}}
             {:type :assignment :name "i" :statement {:type :expression :statement "i + 1"}})
-        {:type :assignment :name "v" :statement "30"})}
+        {:type :statement :statement {:type :assignment :name "v" :statement "0.3"}})}
     {:type :return :name "v"}])
 
 (def control-test {:type :control, :statement (list
@@ -46,12 +47,14 @@
         {:type :declaration :data-type "int" :name "i" :statement "0" }
         {:type :statement :statement {:type :expression :statement "i < 50"}}
         {:type :assignment :name "i" :statement {:type :expression :statement "i + 1"}})
-    {:type :assignment :name "v" :statement "30"})})
+    {:type :assignment :name "v" :statement "0.3"})})
 
 (def main-function [
-    {:type :statement, :statement "gl_FragColor = <nested1>;"}
-    {:type :call, :statement "vec4(1, 1, 1, 1)"}
-])
+    {:type :statement :statement 
+        {:type :assignment :name "gl_FragColor" :statement
+            {:type :call :statement (list "vec4" 1 1 1 1)}}}])
+
+;=========================
 
 (defn get-parsed-parameters [statements]
     (let [params (filter #(= (:type %) :parameter) statements)]
@@ -72,7 +75,7 @@
         (if (map? statement)
             (case (:type statement)
                 :declaration (str (:data-type statement) " " (:name statement) (if (contains? statement :statement) (str " = " (compose-statement (:statement statement)))) ";")
-                :assignment (str (:name statement) " = " (compose-statement (:statement statement)) ";")
+                :assignment (str (:name statement) " = " (compose-statement (:statement statement)))
                 :return (str "return" " " (compose-statement (:name statement)) ";")
                 :statement (str (compose-statement (:statement statement)) ";")
                 :expression (str (compose-statement (:statement statement)))
@@ -80,8 +83,8 @@
                 :name (str "<param" (:index statement) ">")
                 :control (let [head (first (:statement statement))
                                body (rest (:statement statement))]
-                            (str (str (first head) "(" (compose-statement (rest head)) ")")
-                                 (str open-block return-break (compose-statement body) return-break close-block)))
+                            (str (if (string? head) head (str (first head) "(" (compose-statement (rest head)) ")"))
+                                 (str open-block "\n" (compose-statement body) "\n" close-block)))
                 "")
             statement)))
 
@@ -100,15 +103,16 @@
           parameter-list (get-parsed-parameters statements)
           composed-statements (compose-statements statements)]
         (str return-type " " name parameter-list open-block return-break
-            (replace-parameters (apply str composed-statements) statements) return-break close-block)))
+            (replace-parameters (apply str composed-statements) statements) return-break close-block return-break)))
 
-(defn glsl-functions [functions]
-    (apply str functions))
+(defn declare-functions [names functions]
+    (apply str (map glsl-function names functions)))
 
 (defn glsl-main [statements]
     (glsl-function "main" statements))
 
 (defn assemble-glsl []
-    (str (glsl-prefix)(glsl-functions [test-function])(glsl-main main-function)))
+    (str (glsl-prefix)(declare-functions ["a"][test-function])(glsl-main main-function)))
 
-(defn test [] (println (glsl-function "test" test-function)))
+(defn write-file [name]
+    (spit (str "src/exercises/glsl/" name ".frag") (assemble-glsl)))
