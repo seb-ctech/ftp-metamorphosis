@@ -20,7 +20,6 @@
 (defn first-generation [input-string]
   input-string)
 
-;TODO: Implement overall concurrent architecture
 (defn metamorph-loop
   [state]
   (let [event (listen-for-event)
