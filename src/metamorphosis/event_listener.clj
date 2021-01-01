@@ -21,5 +21,5 @@
 (defn record-input 
     ([time-frame]
         (record-input time-frame build-input))
-    ([time-frame, input]
+    ([time-frame input]
     (input [] (clojure.core/future (Thread/sleep time-frame)))))

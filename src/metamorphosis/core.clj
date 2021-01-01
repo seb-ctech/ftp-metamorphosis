@@ -10,12 +10,13 @@
 (defn listen-for-event []
   (Thread/sleep input-listen-interval)
   (println "check for input")
-  {:new-input? (< (rand) 0.08) :input ["A" "B" "C"]})
+  {:new-input? (< (rand) 0.2) :input (esys/record-input 1000)})
 
 ;TODO: Implement System that evolves current generation into more complex form
-(defn evolve-next-generation [composition]
-  composition)
+(defn evolve-next-generation [theorem]
+  theorem)
 
+;TODO: Implement System that transforms input to initial theorem of meta-algorithm system
 (defn first-generation [input-string]
   input-string)
 
@@ -28,8 +29,8 @@
     (if restart?
       (assoc state :theorem (first-generation new-input))
       (if (contains? state :theorem)
-        (assoc state :theorem (evolve-next-generation (:theorem state))
-        state)))))
+        (assoc state :theorem (evolve-next-generation (:theorem state)))
+        state))))
   
 (defn -main []
   (gsys/start-visualization resolution metamorph-loop))
