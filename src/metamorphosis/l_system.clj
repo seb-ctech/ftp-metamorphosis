@@ -10,3 +10,5 @@
 
 (def axiom [:a :b :c :d])
 
+(defn parse-input 
+    [input] input)

@@ -4,7 +4,10 @@
             [metamorphosis.l-system :as lsys]))
 
 ;TODO: Implement overall concurrent architecture
-(defn metamorph-loop [])
+(defn metamorph-loop []
+  (gsys/render (lsys/parse-input (esys/basic-keyboard)))
+  (Thread/sleep 1000)
+  (metamorph-loop))
 
 ;TODO: Implement event-listener System with abstract interface to whatever external system I choose that processes the input
 (defn listen-for-event [])
@@ -17,5 +20,3 @@
 
 
 (defn -main [& args])
-
-(-main)

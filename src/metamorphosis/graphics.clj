@@ -6,6 +6,8 @@
 ;      1. Every generation represents one layer of complexity contained in higher levels
 ;      2. One Layer of complexity is made out of an algorithm that contains the algorithms of the lower levels
 
+(defn render [string] (println string))
+
 ;returns a state
 (defn setup-sketch [])
 
