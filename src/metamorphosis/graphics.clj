@@ -6,21 +6,17 @@
 ;      1. Every generation represents one layer of complexity contained in higher levels
 ;      2. One Layer of complexity is made out of an algorithm that contains the algorithms of the lower levels
 
+
+
 (defn render [string] (println string))
 
 ;returns a state
-(defn setup-sketch [])
-
-;updates the state per frame
-(defn update-sketch [])
+(defn setup-sketch [initial]
+    {:string initial})
 
 ;renders the state that was updated
-(defn draw-sketch [])
+(defn draw-sketch [state])
 
-; Main Entry point for Quil Sketches
-(defn metamorph [] (q/defsketch metamorphosis
-    :title "Metamorphosis"
-    :size [1000 1000]
-    :setup setup-sketch
-    :update update-sketch
-    :draw draw-sketch))
+; Programmatic creation of a quil sketch
+(defn start-visualization [size initial update]
+    (q/sketch :size size :setup #(setup-sketch initial) :update update :draw draw-sketch :middleware [m/fun-mode]))
