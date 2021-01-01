@@ -6,17 +6,23 @@
 ;      1. Every generation represents one layer of complexity contained in higher levels
 ;      2. One Layer of complexity is made out of an algorithm that contains the algorithms of the lower levels
 
-
-
-(defn render [string] (println string))
-
 ;returns a state
-(defn setup-sketch [initial]
-    {:string initial})
+(defn setup-sketch []
+    {})
+
+(defn render-generation [generation])
 
 ;renders the state that was updated
-(defn draw-sketch [state])
+(defn draw-sketch [state]
+    (q/background 0)
+    (when (contains? state :theorem)
+        (render-generation (:theorem state))))
 
 ; Programmatic creation of a quil sketch
-(defn start-visualization [size initial update]
-    (q/sketch :size size :setup #(setup-sketch initial) :update update :draw draw-sketch :middleware [m/fun-mode]))
+(defn start-visualization [size update-loop]
+    (q/sketch 
+        :size size 
+        :setup setup-sketch
+        :update update-loop
+        :draw draw-sketch
+        :middleware [m/fun-mode]))

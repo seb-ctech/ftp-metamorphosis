@@ -10,32 +10,26 @@
 (defn listen-for-event []
   (Thread/sleep input-listen-interval)
   (println "check for input")
-  {:new-input (< (rand) 0.08) :motif ["A" "B" "C"]})
+  {:new-input? (< (rand) 0.08) :input ["A" "B" "C"]})
 
 ;TODO: Implement System that evolves current generation into more complex form
-(defn evolve-next-generation [state]
-  state)
+(defn evolve-next-generation [composition]
+  composition)
+
+(defn first-generation [input-string]
+  input-string)
 
 ;TODO: Implement overall concurrent architecture
 (defn metamorph-loop
-  []
+  [state]
   (let [event (listen-for-event)
-        restart? (:new-input event)
-        initial (:motif event)]
-    (println event)
+        restart? (:new-input? event)
+        new-input (:input event)]
     (if restart?
-      (do
-        (gsys/start-visualization resolution initial evolve-next-generation)
-        (metamorph-loop))
-      (metamorph-loop))))
+      (assoc state :theorem (first-generation new-input))
+      (if (contains? state :theorem)
+        (assoc state :theorem (evolve-next-generation (:theorem state))
+        state)))))
   
-
-
-(defn -main [& args])
-
-(defn open-close-sketch 
-  []
-  (let [sketch (gsys/start-visualization resolution [] evolve-next-generation)]
-    (println sketch (type sketch))
-    (Thread/sleep 200)
-    (quil.core/with-sketch sketch quil.core/exit)))
+(defn -main []
+  (gsys/start-visualization resolution metamorph-loop))
