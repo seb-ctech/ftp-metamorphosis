@@ -1,4 +1,5 @@
-(ns metamorphosis.l-system)
+(ns metamorphosis.l-system
+    (:gen-class))
 
 ;TODO: Define Alphabet
 ;TODO: Implement interfacing rules between L-System (String of Characters) and Graphic-Algorithms:

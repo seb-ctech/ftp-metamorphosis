@@ -1,7 +1,8 @@
 (ns metamorphosis.core
   (:require [metamorphosis.graphics :as gsys]
             [metamorphosis.event-listener :as esys]
-            [metamorphosis.l-system :as lsys]))
+            [metamorphosis.l-system :as lsys])
+  (:gen-class))
 
 (def resolution [1000 1000])
 (def input-listen-interval 500)

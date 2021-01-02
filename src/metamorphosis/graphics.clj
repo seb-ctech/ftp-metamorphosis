@@ -1,7 +1,8 @@
 (ns metamorphosis.graphics
     (:require [quil.core :as q]
               [quil.middleware :as m]
-              [metamorphosis.graphics.translation :as t]))
+              [metamorphosis.graphics.translation :as t])
+    (:gen-class))
 
 ;TODO: Find visual translation made out of composable functions that is fitting for a beginning motif. Ideally 3D:
 ;      1. Every generation represents one layer of complexity contained in higher levels
