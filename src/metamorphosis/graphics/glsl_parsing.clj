@@ -1,10 +1,10 @@
-; 3. Exercise: composing a working glsl piece with two or three layers
-;TODO: Refactor for better readability: decompose nested function compositions by indenting on a new row
-(ns exercises.glsl-parsing)
+; This contains a parsing algorithm that translate an intermediate meta-data structure to valid GLSL-ES Code
+(ns metamorphosis.graphics.glsl-parsing)
 
 (def return-break "\n\n")
 (def open-block "{")
 (def close-block "}")
+(def glsl-folder "src/metamorphosis/graphics/glsl/")
 
 (defn glsl-prefix []
     (str "#ifdef GL_ES\n" 
@@ -21,9 +21,9 @@
 
 ;=============== TEST DATA =========================
 
-;DOC: Trying out a function parsing algorithms with keys that dictate a parsing syntax: :type return, statement, control(nested), declaration, call
+;DOC: Trying out a function parsing algorithm with keys that dictate a parsing syntax: :type return, statement, control(nested), declaration, call
 ; Statements can be: function calls, expressions/operations and assignments;
-(def test-function [
+(def test-function {:name "a" :function [
     {:type :parameter, :data-type "float", :name "a"}
     {:type :declaration, :data-type "float", :name "v"}
     {:type :control, :statement (list 
@@ -41,7 +41,7 @@
             {:type :statement :statement {:type :expression :statement "i < 50"}}
             {:type :assignment :name "i" :statement {:type :expression :statement "i + 1"}})
         {:type :statement :statement {:type :assignment :name "v" :statement "0.3"}})}
-    {:type :return :name "v"}])
+    {:type :return :name "v"}]})
 
 (def control-test {:type :control, :statement (list
     (list "for" 
@@ -59,12 +59,20 @@
 
 (defn get-parsed-parameters [statements]
     (let [params (filter #(= (:type %) :parameter) statements)]
-        (str "(" (clojure.string/join ", " (map #(str (:data-type %) " " (:name %)) params)) ")")))
+        (str "(" 
+             (clojure.string/join ", " 
+                (map #(str (:data-type %) " " (:name %)) 
+                    params)) 
+             ")")))
 
 (defn get-return-type [statements]
-    (let [type-statements (filter #(or (= (:type %) :declaration) (= (:type %) :parameter)) statements)
-          returned-variable (:name (first (filter #(= (:type %) :return) statements)))
-          matched-names (filter #(= returned-variable (:name %)) type-statements)]
+    (let [type-statements (filter #(or (= (:type %) :declaration) (= (:type %) :parameter)) 
+                                statements)
+          returned-variable (:name (first 
+                                        (filter #(= (:type %) :return) 
+                                            statements)))
+          matched-names (filter #(= returned-variable (:name %)) 
+                            type-statements)]
         (if (> (count matched-names) 0)
             (:data-type (first matched-names))
             "void")))
@@ -75,45 +83,79 @@
         (reduce #(str %1 (compose-statement %2)) "" statement)
         (if (map? statement)
             (case (:type statement)
-                :declaration (str (:data-type statement) " " (:name statement) (if (contains? statement :statement) (str " = " (compose-statement (:statement statement)))) ";")
+                :declaration (str (:data-type statement) " " (:name statement) (if (contains? statement :statement) 
+                                                                                    (str " = " (compose-statement (:statement statement)))) 
+                                ";")
                 :assignment (str (:name statement) " = " (compose-statement (:statement statement)))
                 :return (str "return" " " (compose-statement (:name statement)) ";")
                 :statement (str (compose-statement (:statement statement)) ";")
                 :expression (str (compose-statement (:statement statement)))
-                :call (str (first (:statement statement)) "(" (clojure.string/join ", " (map compose-statement (rest (:statement statement)))) ")")
+                :call (str (first (:statement statement)) 
+                            "(" (clojure.string/join ", " 
+                                    (map compose-statement 
+                                        (rest (:statement statement)))) 
+                            ")")
                 :name (str "<param" (:index statement) ">")
                 :control (let [head (first (:statement statement))
                                body (rest (:statement statement))]
-                            (str (if (string? head) head (str (first head) "(" (compose-statement (rest head)) ")"))
+                            (str (if (string? head) 
+                                     head 
+                                     (str (first head) "(" (compose-statement (rest head)) ")"))
                                  (str open-block "\n" (compose-statement body) "\n" close-block)))
                 "")
             statement)))
 
 (defn compose-statements [statements]
-    (let [valid-types [:assignment :control :call :expression :statement :declaration :return]]
-        (map compose-statement (filter (fn [statement] (some #(= (:type statement) %) valid-types)) statements) )))
+    (let [valid-types [:assignment 
+                       :control 
+                       :call 
+                       :expression 
+                       :statement 
+                       :declaration 
+                       :return]]
+        (map compose-statement 
+            (filter (fn [statement] (some #(= (:type statement) %) 
+                                        valid-types))
+                 statements))))
 
 (defn replace-parameters [glsl-string statements]
-    (let [parameters (into [] (filter #(= (:type %) :parameter) statements))
+    (let [parameters (into [] (filter #(= (:type %) :parameter) 
+                                    statements))
          parameter-calls (distinct (re-seq #"<param\d>" glsl-string))
-         parameter-indexes (map #(let [num (Integer/parseInt (re-find #"\d" %))] (list num (:name (get parameters num)))) parameter-calls)]
-        (reduce #(clojure.string/replace %1 (re-pattern (str "<param" (first %2) ">")) (last %2)) glsl-string parameter-indexes)))
+         parameter-indexes (map #(let [num (Integer/parseInt (re-find #"\d" %))] 
+                                    (list num (:name (get parameters num))))
+                                 parameter-calls)]
+        (reduce #(clojure.string/replace %1 
+                    (re-pattern (str "<param" (first %2) ">")) 
+                    (last %2)) 
+            glsl-string parameter-indexes)))
 
 (defn glsl-function [name statements]
     (let [return-type (get-return-type statements)
           parameter-list (get-parsed-parameters statements)
           composed-statements (compose-statements statements)]
-        (str return-type " " name parameter-list open-block return-break
-            (replace-parameters (apply str composed-statements) statements) return-break close-block return-break)))
+        (str return-type " " 
+            name 
+            parameter-list 
+            open-block 
+            return-break
+            (replace-parameters (apply str composed-statements) 
+                statements) 
+            return-break 
+            close-block 
+            return-break)))
 
-(defn declare-functions [names functions]
-    (apply str (map glsl-function names functions)))
+(defn declare-functions [functions]
+    (apply str (map #(glsl-function (:name %)(:function %))
+                     functions)))
 
 (defn glsl-main [statements]
     (glsl-function "main" statements))
 
-(defn assemble-glsl []
-    (str (glsl-prefix)(declare-functions ["a"][test-function])(glsl-main main-function)))
+(defn assemble-glsl [glsl-structure]
+    (str (glsl-prefix)
+         (declare-functions (:functions glsl-structure))
+         (glsl-main (:main glsl-structure))))
 
-(defn write-file [name]
-    (spit (str "src/exercises/glsl/" name ".frag") (assemble-glsl)))
+(defn write-file [name code]
+    (spit (str glsl-folder name ".frag") code))
