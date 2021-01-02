@@ -11,6 +11,10 @@
 (defn setup-sketch []
     {})
 
+(defn draw-test-motif 
+    [state]
+    (q/background 0))
+
 (defn render-generation [generation]
     (t/make-quil (t/build-quil-algorithm generation)))
 
@@ -26,5 +30,5 @@
         :size size 
         :setup setup-sketch
         :update update-loop
-        :draw draw-sketch
+        :draw draw-test-motif
         :middleware [m/fun-mode]))
