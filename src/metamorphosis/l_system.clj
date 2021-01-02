@@ -10,5 +10,11 @@
 
 (def axiom [:a :b :c :d])
 
+(def alphabet ["A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"])
+
+(defn build-random-axiom 
+    []
+    (filter (fn [a] (< (rand) 0.2)) alphabet))
+
 (defn parse-input 
     [input] input)
