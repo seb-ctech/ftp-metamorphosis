@@ -1,6 +1,6 @@
 # metamorphosis
 
-A Quil sketch designed to ... well, that part is up to you.
+An Artistic installation that explores themes of Reproduction (Like the on of DNA), motific evolution and the meaning of "Meta" and self-referential behavior in Art and Programming.
 
 ## Usage
 
@@ -13,7 +13,8 @@ A Quil sketch designed to ... well, that part is up to you.
 
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2020 Sebastian Wilhelm, Filmuniversität KONRAD WOLF
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+## Disclaimer
+
+This Project makes use of [ohpauleez's](https://github.com/ohpauleez/clojure-leap) leap-motion wrapper for clojure. 
