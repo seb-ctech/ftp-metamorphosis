@@ -13,7 +13,7 @@ An Artistic installation that explores themes of Reproduction (Like the on of DN
 
 ## License
 
-Copyright © 2020 Sebastian Wilhelm, Filmuniversität KONRAD WOLF
+Copyright © 2021 Sebastian Wilhelm, Filmuniversität KONRAD WOLF
 
 ## Disclaimer
 
