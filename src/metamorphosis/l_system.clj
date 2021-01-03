@@ -11,11 +11,17 @@
 
 (def axiom [:a :b :c :d])
 
-(def alphabet ["A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"])
+(def alphabet ["A" "B" "C"])
 
 (defn build-random-axiom 
     []
-    (filter (fn [a] (< (rand) 0.2)) alphabet))
+    (let [length (+ (rand-int 3) 2)]
+        (loop [string []]
+            (if (< (count string) length)
+                (recur (conj string 
+                            (get alphabet 
+                                (rand-int (count alphabet)))))
+                string))))
 
 (defn parse-input 
     [input] input)
