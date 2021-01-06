@@ -32,4 +32,5 @@
         :setup setup-sketch
         :update update-loop
         :draw draw-test-motif
-        :middleware [m/fun-mode]))
+        :middleware [m/fun-mode])
+        :renderer :p2d)
