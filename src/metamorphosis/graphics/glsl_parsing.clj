@@ -4,7 +4,7 @@
 (def return-break "\n\n")
 (def open-block "{")
 (def close-block "}")
-(def glsl-folder "src/metamorphosis/graphics/glsl/")
+(def glsl-folder "resources/glsl/")
 
 (defn glsl-prefix []
     (str "#ifdef GL_ES\n" 
@@ -43,17 +43,21 @@
         {:type :statement :statement {:type :assignment :name "v" :statement "0.3"}})}
     {:type :return :name "v"}]})
 
-(def control-test {:type :control, :statement (list
-    (list "for" 
-        {:type :declaration :data-type "int" :name "i" :statement "0" }
-        {:type :statement :statement {:type :expression :statement "i < 50"}}
-        {:type :assignment :name "i" :statement {:type :expression :statement "i + 1"}})
-    {:type :assignment :name "v" :statement "0.3"})})
+(def control-test {:name "control" :function [
+    {:type :declaration, :data-type "float", :name "v"}
+    {:type :control, :statement (list
+        (list "for" 
+            {:type :declaration :data-type "int" :name "i" :statement "0" }
+            {:type :statement :statement {:type :expression :statement "i < 50"}}
+            {:type :assignment :name "i" :statement {:type :expression :statement "i + 1"}})
+            {:type :statement :statement {:type :assignment :name "v" :statement "0.3"}})}]})
+
+(def test-functions [test-function control-test])
 
 (def main-function [
     {:type :statement :statement 
         {:type :assignment :name "gl_FragColor" :statement
-            {:type :call :statement (list "vec4" 1 1 1 1)}}}])
+            {:type :call :statement (list "vec4" 1.0 0.5 0.0 1.0)}}}])
 
 ;=========================
 
@@ -152,10 +156,15 @@
 (defn glsl-main [statements]
     (glsl-function "main" statements))
 
-(defn assemble-glsl [glsl-structure]
-    (str (glsl-prefix)
-         (declare-functions (:functions glsl-structure))
-         (glsl-main (:main glsl-structure))))
+(defn assemble-glsl 
+    ([glsl-structure]
+        (assemble-glsl
+            (:functions glsl-structure)
+            (:main glsl-structure)))
+    ([functions main]
+        (str (glsl-prefix)
+             (declare-functions functions)
+             (glsl-main main))))
 
-(defn write-file [name code]
-    (spit (str glsl-folder name ".frag") code))
+(defn write-file [file code]
+    (spit (str glsl-folder file) code))

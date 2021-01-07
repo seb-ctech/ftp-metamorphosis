@@ -7,3 +7,6 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /src/metamorphosis/graphics/glsl
+*.glsl
+*.frag
+*.vert

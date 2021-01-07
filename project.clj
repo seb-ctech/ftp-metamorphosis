@@ -7,4 +7,5 @@
                  [quil "3.1.0"]
                  [org.clojars.noodle-incident/leap-linux-native-deps "1.0.0"]
                  [rogerallen/leaplib "2.0.2"]]
+  :resource-paths ["resources" "resources/glsl"]
   :main metamorphosis.core)

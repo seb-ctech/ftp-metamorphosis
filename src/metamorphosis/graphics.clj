@@ -8,9 +8,20 @@
 ;      1. Every generation represents one layer of complexity contained in higher levels
 ;      2. One Layer of complexity is made out of an algorithm that contains the algorithms of the lower levels
 
-;returns a state
+(def fragment-shader "test.frag")
+
+(defn reload-shader 
+    ([] (reload-shader {}))
+    ([state]
+        (assoc state :shader (q/load-shader fragment-shader))))
+
+(defn test-glsl [shader]
+   (when (q/loaded? shader)
+    (q/shader shader)
+    (q/rect 0 0 (q/width)(q/height))))
+
 (defn setup-sketch []
-    {})
+   {})
 
 (defn draw-test-motif 
     [state]
@@ -29,8 +40,8 @@
 (defn start-visualization [size update-loop]
     (q/sketch 
         :size size 
+        :renderer :p2d
         :setup setup-sketch
         :update update-loop
         :draw draw-test-motif
-        :middleware [m/fun-mode])
-        :renderer :p2d)
+        :middleware [m/fun-mode]))

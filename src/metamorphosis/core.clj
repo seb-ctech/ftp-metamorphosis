@@ -4,7 +4,7 @@
             [metamorphosis.l-system :as lsys])
   (:gen-class))
 
-(def resolution [1000 1000])
+(def resolution [500 500])
 (def input-listen-interval 500)
 
 ;TODO: Implement event-listener System with abstract interface to whatever external system I choose that processes the input
@@ -20,6 +20,8 @@
 (defn first-generation [input-string]
   input-string)
 
+;TODO: Implement a timer after which the next generation get's evolved
+;TODO: Implement gsys/reload-shader
 (defn metamorph-loop
   [state]
   (let [event (listen-for-event)
