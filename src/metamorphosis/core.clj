@@ -35,5 +35,6 @@
           (assoc state :theorem (evolve-next-generation (:theorem state))))
         state))))
   
-(defn -main []
+(defn -main [& args]
+  (println args)
   (gsys/start-visualization resolution metamorph-loop))

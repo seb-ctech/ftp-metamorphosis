@@ -40,6 +40,8 @@
 (defn start-visualization [size update-loop]
     (q/sketch 
         :size size 
+        :display 2
+        :features [:keep-on-top]
         :renderer :p2d
         :setup setup-sketch
         :update update-loop
