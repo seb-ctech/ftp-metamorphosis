@@ -21,20 +21,21 @@
   input-string)
 
 ;TODO: Implement a timer after which the next generation get's evolved
-;TODO: Implement gsys/reload-shader
 (defn metamorph-loop
   [state]
-  (let [event (listen-for-event)
-        restart? (:new-input? event)
-        new-input (:input event)]
-    (if restart?
-      (assoc state :theorem (first-generation new-input))
-      (if (contains? state :theorem)
-        (do
-          (println (:theorem state))
-          (assoc state :theorem (evolve-next-generation (:theorem state))))
-        state))))
-  
+    (let [event (listen-for-event)
+          restart? (:new-input? event)
+          new-input (:input event)]
+      (if restart?
+        (assoc state :theorem (first-generation new-input))
+        (if (contains? state :theorem)
+          (do
+            (println (:theorem state))
+            (assoc state :theorem (evolve-next-generation (:theorem state))))
+          state))))
+    
 (defn -main [& args]
-  (println args)
-  (gsys/start-visualization resolution metamorph-loop))
+  (let [setup (if (nil? args) 
+                gsys/setup-sketch
+                #(assoc (gsys/setup-sketch) :mode (first args)))]
+    (gsys/start-visualization resolution setup metamorph-loop)))

@@ -20,8 +20,9 @@
     (q/shader shader)
     (q/rect 0 0 (q/width)(q/height))))
 
-(defn setup-sketch []
-   {})
+;TODO: Implement gsys/reload-shader
+(defn render-shader [shader]
+    (q/background 0))
 
 (defn draw-test-motif 
     [state]
@@ -30,20 +31,26 @@
 (defn render-generation [generation]
     (t/make-quil (t/build-quil-algorithm generation)))
 
+(defn setup-sketch []
+    {})
+
 ;renders the state that was updated
 (defn draw-sketch [state]
-    (if (contains? state :theorem)
-        (render-generation (:theorem state))
-        (q/background 0)))
+    (if (= (:mode state) :glsl)
+        (render-shader (:shader state))
+        (if (contains? state :theorem)
+            (render-generation (:theorem state))
+            (q/background 0))))
 
 ; Programmatic creation of a quil sketch
-(defn start-visualization [size update-loop]
-    (q/sketch 
-        :size size 
-        :display 2
-        :features [:keep-on-top]
-        :renderer :p2d
-        :setup setup-sketch
-        :update update-loop
-        :draw draw-test-motif
-        :middleware [m/fun-mode]))
+(defn start-visualization 
+    [size setup update-loop]
+        (q/sketch 
+            :size size 
+            :display 2
+            :features [:keep-on-top]
+            :renderer :p2d
+            :setup setup
+            :update update-loop
+            :draw draw-test-motif
+            :middleware [m/fun-mode]))
