@@ -1,4 +1,4 @@
-(ns metamorphosis.l-system
+(ns metamorphosis.meta-ruleset
     (:gen-class))
 
 ;TODO: Define Alphabet
