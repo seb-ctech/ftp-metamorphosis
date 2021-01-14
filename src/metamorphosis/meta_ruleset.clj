@@ -9,8 +9,6 @@
 ;      from the string of the current generation and when evaluated produces
 ;      the string for the next generation
 
-(def axiom [:a :b :c :d])
-
 (def alphabet ["A" "B" "C"])
 
 (defn build-random-axiom 
