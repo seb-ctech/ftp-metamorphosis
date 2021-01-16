@@ -25,7 +25,8 @@
                 string))))
 
 (defn parse-input 
-    [input] input)
+    [input] 
+    (reduce #(conj %1 (str %2)) [] input))
 
 ;TODO: A sequence of commands that are needed to make the evolution to the next level possible
 (defn level-glue []
@@ -41,6 +42,9 @@
 
 (defn has-lower-level? [entry]
     (vector? entry))
+
+;TODO: mutate must implement a macro that get's composed out of the formal system aswell
+; to create different kinds of evolution/mutations on single entries or entire "levels"
 
 (defn mutate 
     [structure rate]
