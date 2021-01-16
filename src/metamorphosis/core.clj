@@ -7,7 +7,6 @@
 
 (def resolution [500 500])
 (def evolving-interval 20)
-(def input-listen-interval 500)
 
 (defn init []
   (let [state (gsys/setup-sketch)]
@@ -15,30 +14,18 @@
                     :count 0 
                     :target evolving-interval})))
 
-;TODO: Implement event-listener System with abstract interface to whatever external system I choose that processes the input
-(defn listen-for-event []
-  (Thread/sleep input-listen-interval)
-  {:new-input? false :input (msys/build-random-axiom)})
-
-(defn evolve-next-generation [theorem]
-  (msys/next-step theorem))
-
-;TODO: Implement System that transforms input to initial theorem of meta-algorithm system
-(defn first-generation [input-string]
-  input-string)
-
 (defn metamorph-loop
   [state]
-    (let [event (listen-for-event)
+    (let [event (esys/listen-for-event)
           restart? (:new-input? event)
           new-input (:input event)
           state (gsys/update-graphics (u/update-util state))]
       (if restart?
-        (assoc state :theorem (first-generation new-input))
+        (assoc state :theorem (msys/first-generation new-input))
         (if (and (contains? state :theorem) (u/time-up? state))
           (do
             (println (str "new theorem!" " " (:theorem state)))
-            (assoc state :theorem (evolve-next-generation (:theorem state))))
+            (assoc state :theorem (msys/evolve-next-generation (:theorem state))))
            state))))
     
 (defn -main [& args]
