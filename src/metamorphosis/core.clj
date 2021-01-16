@@ -20,7 +20,6 @@
   (Thread/sleep input-listen-interval)
   {:new-input? false :input (msys/build-random-axiom)})
 
-;TODO: Implement System that evolves current generation into more complex form
 (defn evolve-next-generation [theorem]
   (msys/next-step theorem))
 
@@ -28,19 +27,17 @@
 (defn first-generation [input-string]
   input-string)
 
-;TODO: Implement a timer after which the next generation get's evolved
 (defn metamorph-loop
   [state]
     (let [event (listen-for-event)
           restart? (:new-input? event)
           new-input (:input event)
           state (gsys/update-graphics (u/update-util state))]
-      (println state)
       (if restart?
         (assoc state :theorem (first-generation new-input))
         (if (and (contains? state :theorem) (u/time-up? state))
           (do
-            (println "new theorem!")
+            (println (str "new theorem!" " " (:theorem state)))
             (assoc state :theorem (evolve-next-generation (:theorem state))))
            state))))
     

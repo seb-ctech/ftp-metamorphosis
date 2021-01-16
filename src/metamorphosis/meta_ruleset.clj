@@ -1,13 +1,8 @@
 (ns metamorphosis.meta-ruleset
     (:gen-class))
 
-;TODO: Define Alphabet
-;TODO: Implement interfacing rules between L-System (String of Characters) and Graphic-Algorithms:
-;      an abstract data structure which can be translated to a specific graphical implementation
-;TODO: Implement function to create axiom from input-data-structure provided by the input-processor
-;TODO: Implement meta-ruleset: that uses macros derived 
-;      from the string of the current generation and when evaluated produces
-;      the string for the next generation
+;TODO: Define Alphabet as abstract structure that can be used to define mutating rules and graphic commands
+;TODO: Implement function to create axiom from input-data-structure provided by the "event-listener" module
 
 (def alphabet ["A" "B" "C"])
 
@@ -28,11 +23,14 @@
     [input] 
     (reduce #(conj %1 (str %2)) [] input))
 
-;TODO: A sequence of commands that are needed to make the evolution to the next level possible
+;TODO: A sequence of commands that are needed to make the evolution to the next level possible:
+; some recursive property for mutation macro 
+;and some scaling/translation for graphic implementation
 (defn level-glue []
     (build-random-axiom 2))
 
-;TODO: Instructions to arrange the structure of the lower level in the current level
+;TODO: Instructions to arrange the structure of the lower level in the current level:
+; is this also decided by the formal-system?
 (defn higher-order-> []
     (build-random-axiom 2))
 
@@ -42,9 +40,6 @@
 
 (defn has-lower-level? [entry]
     (vector? entry))
-
-;TODO: mutate must implement a macro that get's composed out of the formal system aswell
-; to create different kinds of evolution/mutations on single entries or entire "levels"
 
 (defn mutate 
     [structure rate]
@@ -74,6 +69,10 @@
                         (reduce conj composition variation) 
                         (mutate structure 0.3)))
                 composition))))   
+
+;TODO: mutate/next-step must implement a macro that get's composed out of the formal system aswell
+; to create different kinds of evolution/mutations on single entries or entire "levels"
+; must operate with sequence and collection functions.
 
 (defn next-step [structure]
     (println (str "Previous Generation:" " " structure))

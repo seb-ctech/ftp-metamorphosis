@@ -1,8 +1,10 @@
 (ns metamorphosis.event-listener
     (:gen-class))
 
-;TODO: Implement an abstract data-structure that get's processed to the beginning motif for the L-System (Layer 1)
+;TODO: Implement an asynchronous event-listener that can be used as wrapper to any input form (This Layer)
+;TODO: Implement an "abstract data-structure" that abstracts the device specific input and can be processed into an axiom for the formal system (Layer 1)
 ;TODO: Process device-specific input to abstract data-structure (Layer 2)
+
 
 (def input-interval 100)
 

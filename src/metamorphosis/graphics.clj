@@ -20,7 +20,6 @@
     (q/shader shader)
     (q/rect 0 0 (q/width)(q/height))))
 
-;TODO: Implement gsys/reload-shader
 (defn render-shader [shader]
     (q/background 0))
 
