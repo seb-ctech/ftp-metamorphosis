@@ -1,5 +1,7 @@
 (ns metamorphosis.event-listener.input)
 
+;TODO: Process device-specific input to abstract data-structure
+
 ;;=== PROTOTYPE OF ABSTRACT INPUT DATA-STRUCTURE ===
 
 ; What about forms at the same time?

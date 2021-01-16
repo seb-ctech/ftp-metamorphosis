@@ -1,17 +1,6 @@
 (ns metamorphosis.meta-ruleset.mutation
     (:require [metamorphosis.meta-ruleset.formal-system :as f]))
 
-;FIXME: Remove later. Only for developing purposes
-(defn build-random-axiom 
-    ([]
-        (build-random-axiom (+ (rand-int 3) 2)))
-    ([length]
-        (loop [string []]
-            (if (< (count string) length)
-                (recur (conj string 
-                            (f/random-alphabet-letter)))
-                string))))
-
 ;TODO: A sequence of commands that are needed to make the evolution to the next level possible:
 ; some recursive property for mutation macro 
 ;and some scaling/translation for graphic implementation

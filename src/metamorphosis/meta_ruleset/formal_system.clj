@@ -1,8 +1,5 @@
 (ns metamorphosis.meta-ruleset.formal-system)
 
-;TODO: Define Alphabet as abstract structure that can be used to define mutating rules and graphic commands
-;TODO: Implement function to create axiom from input-data-structure provided by the "event-listener" module
-
 ;=== PROTOTYPE OF AN ABSTRACT DATA STRUCTURE ===
 
 ; One generation contains the generation count for the scope a sequence of objects that define a class,
@@ -42,6 +39,8 @@
                 (recur (conj sequence 
                             (random-entry)))
                 {:gen 0 :sequence sequence}))))
+
+;TODO: Implement function to create axiom from input-data-structure provided by the "event-listener" module
 
 (defn process-input [input] 
     (reduce #(conj %1 (str %2)) [] input))
