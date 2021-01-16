@@ -34,9 +34,11 @@
                 #(assoc (init) :mode (first args)))]
     (gsys/start-visualization resolution setup metamorph-loop)))
 
-;=== Entry point for Developing ====
+;=== Entry point for Developing without  ====
 (defn start 
   ([] (gsys/start-visualization resolution #(assoc (init) :theorem (msys/build-random-axiom)) metamorph-loop))
   ([input] 
-    (let [parsed-input (msys/parse-input input)]
+    (let [parsed-input (msys/parse-input (if (and (keyword? input) (= input :standard))  
+                                             esys/test-input
+                                             (esys/command-line-input input)))]
       (gsys/start-visualization resolution #(assoc (init) :theorem parsed-input) metamorph-loop))))

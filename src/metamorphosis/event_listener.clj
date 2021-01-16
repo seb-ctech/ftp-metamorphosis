@@ -8,6 +8,8 @@
 ;TODO: Implement an "abstract data-structure" that abstracts the device specific input and can be processed into an axiom for the formal system (Layer 1)
 ;TODO: Process device-specific input to abstract data-structure (Layer 2)
 
+(def test-input in/test-input)
+
 (def input-listen-interval 500)
 
 ;TODO: Implement event-listener System with abstract interface to whatever external system I choose that processes the input
@@ -17,3 +19,6 @@
 
 (defn basic-keyboard 
     [](clojure.string/upper-case (read-line)))
+
+(defn command-line-input [string]
+    (in/string->input string))

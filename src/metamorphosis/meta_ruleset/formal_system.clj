@@ -28,18 +28,20 @@
 
 (def alphabet [:body :transform :property :amount])
 
-(defn random-alphabet-letter []
-    (get alphabet (rand-int (count alphabet))))
+(defn random-entry []
+    {:class (get alphabet 
+                 (rand-int (count alphabet)))
+     :index (rand-int 5)})
 
 (defn build-random-axiom 
     ([]
-        (build-random-axiom (+ (rand-int 3) 2)))
+        (build-random-axiom (+ (rand-int 6) 3)))
     ([length]
-        (loop [string []]
-            (if (< (count string) length)
-                (recur (conj string 
-                            (random-alphabet-letter)))
-                string))))
+        (loop [sequence []]
+            (if (< (count sequence) length)
+                (recur (conj sequence 
+                            (random-entry)))
+                {:gen 0 :sequence sequence}))))
 
 (defn process-input [input] 
     (reduce #(conj %1 (str %2)) [] input))

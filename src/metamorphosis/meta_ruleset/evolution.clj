@@ -5,19 +5,20 @@
 
 (defn next-step [structure]
     (println (str "Previous Generation:" " " structure))
-    (reduce into 
-        (m/level-glue) 
-        [[structure] (m/compose-mutations structure)]))
+    (reduce #(assoc %1 
+                    :sequence (conj (:sequence %1) %2)) 
+        {:gen (inc (:gen structure)) :sequence (conj (m/glue) structure)} 
+        (m/compose-mutations structure)))
 
 ;==== TEST FUNCTIONS ======
 
 (defn motif->phrase []
     (next-step (f/build-random-axiom)))
 
-(defn phrase->passage []
+(defn motif->passage []
     (next-step (motif->phrase)))
 
-(defn passage->movement []
+(defn motif->movement []
     (next-step (phrase->passage)))
 
 (defn motif->final []
