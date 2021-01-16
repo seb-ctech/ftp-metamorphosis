@@ -34,6 +34,9 @@
 (defn setup-sketch []
     {})
 
+(defn update-graphics [state]
+    state)
+
 ;renders the state that was updated
 (defn draw-sketch [state]
     (if (= (:mode state) :glsl)

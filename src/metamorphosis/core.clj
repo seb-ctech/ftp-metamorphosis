@@ -20,12 +20,16 @@
 (defn first-generation [input-string]
   input-string)
 
+(defn update-util [state]
+  state)
+
 ;TODO: Implement a timer after which the next generation get's evolved
 (defn metamorph-loop
   [state]
     (let [event (listen-for-event)
           restart? (:new-input? event)
-          new-input (:input event)]
+          new-input (:input event)
+          state (gsys/update-graphics (update-util state))]
       (if restart?
         (assoc state :theorem (first-generation new-input))
         (if (contains? state :theorem)
