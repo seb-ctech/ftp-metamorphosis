@@ -36,7 +36,8 @@
 
 ;=== Entry point for Developing without  ====
 (defn start 
-  ([] (gsys/start-visualization resolution #(assoc (init) :theorem (msys/build-random-axiom)) metamorph-loop))
+  ([] (gsys/start-visualization resolution #(assoc (init) :theorem (metamorphosis.meta-ruleset.formal-system/build-random-axiom)) metamorph-loop))
+  ;FIXME: Not working yet, because input does not get processed yet!
   ([input] 
     (let [parsed-input (msys/parse-input (if (and (keyword? input) (= input :standard))  
                                              esys/test-input
