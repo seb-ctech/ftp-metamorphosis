@@ -18,7 +18,7 @@
     (next-step (motif->phrase)))
 
 (defn motif->movement []
-    (next-step (phrase->passage)))
+    (next-step (motif->passage)))
 
 (defn motif->final []
-    (next-step (passage->movement)))
+    (next-step (motif->movement)))
