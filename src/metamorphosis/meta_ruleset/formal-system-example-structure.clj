@@ -1,7 +1,10 @@
+(ns metamorphosis.meta-ruleset.formal-system-example-structure)
 ;Starting Motif
-{:gen 0, :sequence [{:class :body, :index 3} {:class :amount, :index 2} {:class :body, :index 1} {:class :amount, :index 1} {:class :transform, :index 0} {:class :amount, :index 4} {:class :transform, :index 0} {:class :body, :index 2}]}
+(def starting-motif
+    {:gen 0, :sequence [{:class :body, :index 3} {:class :amount, :index 2} {:class :body, :index 1} {:class :amount, :index 1} {:class :transform, :index 0} {:class :amount, :index 4} {:class :transform, :index 0} {:class :body, :index 2}]})
  
 ;Resulting Movement
+(def sample-structure
 {:gen 3, :sequence [
     {:class :transform, :index 3} 
     {:class :transform, :index 1} 
@@ -233,4 +236,4 @@
             {:gen 0, :sequence [{:class :amount, :index 2} {:class :body, :index 1} {:class :amount, :index 1} {:class :transform, :index 0} {:class :transform, :index 0} {:class :amount, :index 4} {:class :body, :index 1} {:class :body, :index 2}]}
         ]}
     ]}
-]}
+]})

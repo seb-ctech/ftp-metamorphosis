@@ -42,5 +42,8 @@
 
 ;TODO: Implement function to create axiom from input-data-structure provided by the "event-listener" module
 
+(defn process-string [input] 
+    (reduce #(conj %1 (str %2)) [] input))
+
 (defn process-input [input] 
     (reduce #(conj %1 (str %2)) [] input))
