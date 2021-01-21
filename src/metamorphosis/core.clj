@@ -24,7 +24,8 @@
         (assoc state :theorem (msys/first-generation new-input))
         (if (and (contains? state :theorem) (u/time-up? state))
           (do
-            (println (str "new theorem!" " " (:theorem state)))
+            (println "new theorem!")
+            (println (:theorem state))
             (assoc state :theorem (msys/evolve-next-generation (:theorem state))))
            state))))
     
