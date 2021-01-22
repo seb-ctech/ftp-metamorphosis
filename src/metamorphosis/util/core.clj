@@ -1,4 +1,4 @@
-(ns metamorphosis.util)
+(ns metamorphosis.util.core)
 
 (defn handle-timer [state]
     (let [time (:time state)

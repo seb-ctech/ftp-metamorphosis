@@ -1,4 +1,4 @@
-(ns metamorphosis.meta-ruleset
+(ns metamorphosis.meta-ruleset.core
     (:require 
         [metamorphosis.meta-ruleset.formal-system :as f]
         [metamorphosis.meta-ruleset.evolution :as evolve]

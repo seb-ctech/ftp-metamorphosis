@@ -1,4 +1,4 @@
-(ns metamorphosis.graphics
+(ns metamorphosis.graphics.core
     (:require [quil.core :as q]
               [quil.middleware :as m]
               [metamorphosis.graphics.translation :as t])

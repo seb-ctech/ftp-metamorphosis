@@ -1,8 +1,8 @@
 (ns metamorphosis.core
-  (:require [metamorphosis.util :as u]
-            [metamorphosis.graphics :as gsys]
-            [metamorphosis.event-listener :as esys]
-            [metamorphosis.meta-ruleset :as msys])
+  (:require [metamorphosis.util.core :as u]
+            [metamorphosis.graphics.core :as gsys]
+            [metamorphosis.event-listener.core :as esys]
+            [metamorphosis.meta-ruleset.core :as msys])
   (:gen-class))
 
 (def resolution [500 500])

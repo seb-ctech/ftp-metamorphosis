@@ -1,5 +1,5 @@
 (ns metamorphosis.meta-ruleset.translation
-    (:require [metamorphosis.event-listener.input :as in]))
+    (:require [metamorphosis.event-listener.input.core :as in]))
 
 (def test-input in/test-input)
 (def input-signals in/input-signals)
