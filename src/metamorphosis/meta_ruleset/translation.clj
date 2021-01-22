@@ -33,7 +33,8 @@
         (conj (if (> index-of-strongest 0) 
                     (vector (get input (dec index-of-strongest)))
                     []) strongest)))
-
+                
+;TODO: Find a better translation algorithm, that is not limited to 'every 3' pattern
 ;TODO: How do you account for breaks? For now I keep it out
 ;TODO: Can I refactor this more elegantly?
 

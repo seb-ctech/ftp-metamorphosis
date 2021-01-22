@@ -14,7 +14,7 @@
     (f/random-entry))
 
 (defn has-lower-level? [entry]
-    (and (contains? entry :gen) (> (:gen entry) 0)))
+    (and (contains? entry :gen)))
 
 (defn higher-order-> []
     (:sequence (f/build-random-axiom 2)))
@@ -35,6 +35,9 @@
                             2 (recur remaining (conj new-sequence (change-letter next)))) ;Change entry
                         (recur remaining (conj new-sequence next)))))
             (assoc structure :sequence new-sequence))))
+ 
+;TODO: Compose mutations needs to be repeated on lower levels
+; for example: Phrase 2 of Sentence 1 has two repetitions of motif and Phrase 1 of Sentence 2 has four repetitions of motif
             
 (defn compose-mutations [structure]
     (let [times (inc (rand-int 3))
