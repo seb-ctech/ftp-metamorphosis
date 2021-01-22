@@ -55,4 +55,8 @@
 ; to create different kinds of evolution/mutations on single entries or entire "levels"
 ; must operate with sequence and collection functions.
 
-(defn meta-mutate [structure])
+(defn build-mutation-algorithm [sequence]
+    )
+
+(defn meta-mutate [structure]
+    (eval (build-mutation-algorithm structure)))
