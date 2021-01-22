@@ -6,10 +6,8 @@
 
 (def build-random-axiom f/build-random-axiom)
 
-(def parse-input f/process-input)
-
 (defn evolve-next-generation [theorem]
     (evolve/next-step theorem))
     
 (defn first-generation [input-sequence]
-    (f/process-input input-sequence))
+    (f/build-axiom input-sequence))

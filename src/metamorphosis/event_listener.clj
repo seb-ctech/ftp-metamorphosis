@@ -16,5 +16,5 @@
 (defn basic-keyboard 
     [](clojure.string/upper-case (read-line)))
 
-(defn command-line-input [string]
-    (in/string->input string))
+(defn command-line [string]
+    (in/command-line string))
