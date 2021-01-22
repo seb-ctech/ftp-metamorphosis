@@ -1,9 +1,6 @@
 (ns metamorphosis.event-listener.input
     (:require [metamorphosis.meta-ruleset.formal-system :as f]
-              [metamorphosis.event-listener.input.translation :as t]
               [metamorphosis.event-listener.input.command-line :as cl]))
-
-;TODO: Process device-specific input to abstract data-structure
 
 ;;=== PROTOTYPE OF ABSTRACT INPUT DATA-STRUCTURE ===
 
@@ -12,12 +9,16 @@
 ; A Signal represent a discrete input form that can be distinguished from others
 
 
+(def input-signals [:A :B :C])
+
 (def test-input [
     {:signal :A :intensity 0.1 :duration 1/10}
     {:signal :B :intensity 0.1 :duration 3/10}
     {:signal :break :duration 2/10}
     {:signal :B :intensity 0.1 :duration 3/10}
 ])
+
+; ==============================================
 
 (def input-interval 2000)
 (def a-input "a")
@@ -37,4 +38,4 @@
     (input [] (clojure.core/future (Thread/sleep time-frame)))))
 
 (defn command-line [string]
-    (t/process-input (cl/string->input string)))
+    (cl/string->input string))

@@ -1,4 +1,3 @@
-;TODO: Remove formal-system dependency that is used for dev purposes
 (ns metamorphosis.core
   (:require [metamorphosis.util :as u]
             [metamorphosis.graphics :as gsys]
@@ -36,12 +35,12 @@
                 #(assoc (init) :mode (first args)))]
     (gsys/start-visualization resolution setup metamorph-loop)))
 
-;=== Entry point for Developing without  ====
+;=== Entry point for Developing without event-listener ====
+
 (defn start 
   ([] (gsys/start-visualization resolution #(assoc (init) :theorem (msys/build-random-axiom)) metamorph-loop))
-  ;FIXME: Not working yet, because input does not get processed yet!
   ([input] 
-    (let [parsed-input (if (and (keyword? input) (= input :standard))  
-                                             esys/test-input
-                                             (esys/command-line input))]
-      (gsys/start-visualization resolution #(assoc (init) :theorem (msys/first-generation parsed-input)) metamorph-loop))))
+      (gsys/start-visualization resolution #(assoc (init) :theorem (msys/first-generation 
+                                                                      (if (and (keyword? input) (= input :standard))  
+                                                                          esys/test-input
+                                                                          (esys/command-line input)))) metamorph-loop)))
