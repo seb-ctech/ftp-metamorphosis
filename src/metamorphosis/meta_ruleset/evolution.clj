@@ -9,6 +9,9 @@
         {:gen (inc (:gen structure)) :sequence (conj (m/glue) structure)} 
         (m/compose-mutations structure)))
 
+(defn next-meta-step [structure]
+    )
+
 ;==== TEST FUNCTIONS ======
 
 (defn motif->phrase []

@@ -28,7 +28,7 @@
     (q/background 0))
 
 (defn render-generation [generation]
-    (t/make-quil (t/build-quil-algorithm generation)))
+    (t/make-quil generation))
 
 (defn setup-sketch []
     {})
