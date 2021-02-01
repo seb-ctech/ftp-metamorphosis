@@ -23,12 +23,8 @@
 (defn render-shader [shader]
     (q/background 0))
 
-(defn draw-test-motif 
-    [state]
-    (q/background 0))
-
 (defn render-generation [generation]
-    (t/make-quil generation))
+    (eval (t/make-quil generation)))
 
 (defn setup-sketch []
     {})
@@ -38,11 +34,11 @@
 
 ;renders the state that was updated
 (defn draw-sketch [state]
+    (q/background 0)
     (if (= (:mode state) :glsl)
         (render-shader (:shader state))
-        (if (contains? state :theorem)
-            (render-generation (:theorem state))
-            (q/background 0))))
+        (when (contains? state :theorem)
+            (render-generation (:theorem state)))))
 
 ; Programmatic creation of a quil sketch
 (defn start-visualization 
@@ -54,5 +50,5 @@
             :renderer :p2d
             :setup setup
             :update update-loop
-            :draw draw-test-motif
+            :draw draw-sketch
             :middleware [m/fun-mode]))

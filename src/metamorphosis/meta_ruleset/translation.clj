@@ -26,6 +26,40 @@
                                     :property))} 
                     :index (get-entry-position input-signals (:signal input))))))
 
+(defn next-possible-entry [vec index]
+    (loop [current-index index]
+        (let [entry (get vec current-index)]
+            (if entry
+                entry
+                (if (>= current-index 0)
+                    (recur (dec current-index))
+                    (println (str "Not a vector or vector is empty: " vec)))))))
+
+(defn formal-system->form 
+    [entry translation-unit amount]
+    (let [class (:class entry)
+          index (:index entry)
+          amount (:index amount)
+          instruction (next-possible-entry (translation-unit class) index)
+          params (when (second instruction) (next-possible-entry (second instruction) amount))]
+          (if params
+            (cons (first instruction) params)
+            (first instruction))))
+
+
+(defn fs-sequence->instructions
+    "This is a function that transforms a sequence of the formal system to valid provided instruction-set"
+    [sequence instruction-set]
+    (loop [remaining sequence
+            amount {:class :amount :index 0}
+            instructions []]
+        (if (> (count remaining) 0)
+            (let [next (first remaining)]
+                (if (= (:class next) :amount)
+                    (recur (rest remaining) next instructions)
+                    (recur (rest remaining) amount (conj instructions (formal-system->form next instruction-set amount)))))
+            instructions)))
+
 (defn make-first-two [input]
     (let [strongest (strongest-signal input)
           length (count input)
@@ -38,18 +72,15 @@
 ;TODO: How do you account for breaks? For now I keep it out
 ;TODO: Can I refactor this more elegantly?
 
-;FIXME: Amount needs to be allocated properly for reverse...
 (defn swap-amount [sequence]
-    ;1. Divide Sequence in groups of two
-    ;2. Map Over it with reverse
-    ;3. Reassemble into one sequence
-    sequence)
+    (reduce #(conj %1 (first %2) (second %2))
+        []
+        (map reverse (partition 2 sequence))))
 
 (defn process-input [input] 
     (let [input-sequence (into [] (filter #(not (= (:signal %) :break)) input))
           first-two (make-first-two input-sequence)
           rest (filter #(not (contains? (set first-two) %)) input-sequence)]
-        (println first-two)
         (into (into [] (if (> (count first-two) 1)
                         (into (translate-input-signal (first first-two) false) 
                                 (translate-input-signal (second first-two) true))

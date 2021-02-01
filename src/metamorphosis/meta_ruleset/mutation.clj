@@ -58,5 +58,6 @@
 (defn build-mutation-algorithm [sequence]
     )
 
+; Similar to graphical translation, but instead of list in it is a nested list "(transform (property (unit 433) 23) 23)" for one scope
 (defn meta-mutate [structure]
     (eval (build-mutation-algorithm structure)))
