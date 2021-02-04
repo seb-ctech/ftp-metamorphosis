@@ -7,7 +7,7 @@
 ; an additional helper class, that translates to a set of instructions, that make the transition to a higher scope possible 
 ;and some scaling/translation for graphic implementation
 (defn glue []
-    (:sequence (f/build-random-axiom 2)))
+    (:sequence (f/build-random-axiom 2))) ;TODO: Make deterministic
 
 ;TODO: Implement a few functions that operate on sequences.
 ; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
@@ -26,14 +26,6 @@
     ]
 })
 
-(defn pass-down [lower-scope]
-    )
-
-;TODO: Implement an algorithm that separates formal system into branches depending on itself.
-
-;TODO: Instructions to arrange the structure of the lower level in the current level:
-; is this also decided by the formal-system?
-
 (defn change-letter [letter]
     (f/random-entry))
 
@@ -41,23 +33,8 @@
     (and (contains? entry :gen)))
 
 (defn higher-order-> []
-    (:sequence (f/build-random-axiom 2)))
+    (:sequence (f/build-random-axiom 2))) ;TODO: Make deterministic
  
-;TODO: Compose mutations needs to be repeated on lower levels
-; for example: Phrase 2 of Sentence 1 has two repetitions of motif and Phrase 1 of Sentence 2 has four repetitions of motif
-            
-(defn compose-mutations [structure]
-    (let [variation (higher-order->)]
-        (loop [remaining times composition []]
-            (if (> remaining 0)
-                (recur 
-                    (dec remaining)
-                    (conj 
-                        (reduce conj composition variation) 
-                        (mutate structure 0.3)))
-                composition))))  
-
-
 (defn meta-mutate-sequence
     "Function that makes a composed function out of a partial sequence and that takes the same sequence as input" 
     [rate part-sequence]
@@ -68,28 +45,32 @@
                             %) rate) 
                         linear-list)) part-sequence)))
 
-(defn recursive-sequence-mutation [sequence]
-    (meta-mutate-sequence 0.3 (map #(if (has-lower-level? %)
+(defn recursive-system-mutation 
+    "Function that takes a structure of :gen and :sequence and recursively applies meta-mutate on lower-scope sequences"
+    [structure]
+    (let [sequence (:sequence structure)
+          gen (:gen structure)]
+    {:gen gen 
+     :sequence (into (vector) (meta-mutate-sequence 0.3 (map #(if (has-lower-level? %)
                                         (recursive-sequence-mutation %)
                                         %)
-        sequence)))
+        sequence)))}))
 
 ; Similar to graphical translation, but instead of list in it is a nested list "(transform (property (unit 433) 23) 23)" for one scope
+; TODO: Make repetition deterministic
 (defn meta-mutate [structure]
-    (let [variation (higher-order->)]
+    (let [times (inc (rand-int 3))]
         (loop [remaining times composition []]
             (if (> remaining 0)
                 (recur 
                     (dec remaining)
                     (conj 
-                        (reduce conj composition variation) 
-                        (mutate structure 0.3)))
+                        (reduce conj composition (higher-order->)) 
+                        (recursive-system-mutation structure)))
                 composition))))
-
 
 (defn test-mutate-simple []
     (meta-mutate example/simple))
-
 
 (defn test-mutate-complex []
     (meta-mutate example/complex))

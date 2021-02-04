@@ -7,10 +7,7 @@
     (reduce #(assoc %1 
                     :sequence (conj (:sequence %1) %2)) 
         {:gen (inc (:gen structure)) :sequence (conj (m/glue) structure)} 
-        (m/compose-mutations structure)))
-
-(defn next-meta-step [structure]
-    )
+        (m/meta-mutate structure)))
 
 ;==== TEST FUNCTIONS ======
 
