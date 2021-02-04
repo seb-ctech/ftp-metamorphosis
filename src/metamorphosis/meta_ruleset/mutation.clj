@@ -1,11 +1,34 @@
 (ns metamorphosis.meta-ruleset.mutation
-    (:require [metamorphosis.meta-ruleset.formal-system :as f]))
+    (:require [metamorphosis.meta-ruleset.formal-system :as f]
+              [metamorphosis.meta-ruleset.formal-system-example-structure :as example]
+              [metamorphosis.meta-ruleset.translation :as meta-t]))
 
 ;TODO: A sequence of commands that are needed to make the evolution to the next level possible:
-; some recursive property for mutation macro 
+; an additional helper class, that translates to a set of instructions, that make the transition to a higher scope possible 
 ;and some scaling/translation for graphic implementation
 (defn glue []
     (:sequence (f/build-random-axiom 2)))
+
+;TODO: Implement a few functions that operate on sequences. 
+;Unit: creates something new, Transform: Changes the sequence, Property: applies some overall change to the structure
+(def fs->mutation {
+    :unit [
+        (list (fn [n sequence] (identity sequence)) ['(1)]) ; [ () ] TODO: add vectors of argument lists
+    ]
+
+    :transform [
+        (list (fn [n sequence] (identity sequence)) ['(2)])
+    ]
+
+    :property [
+        (list (fn [ sequence] (identity sequence)))
+    ]
+})
+
+(defn pass-down [lower-scope]
+    )
+
+;TODO: Implement an algorithm that separates formal system into branches depending on itself.
 
 ;TODO: Instructions to arrange the structure of the lower level in the current level:
 ; is this also decided by the formal-system?
@@ -51,6 +74,15 @@
                         (mutate structure 0.3)))
                 composition))))  
 
+
+(defn compose-mutation-sequence
+    "Function that makes a composed function out of a partial sequence and that takes the same sequence as input" 
+    [part-sequence]
+    (let [linear-list (meta-t/fs-sequence->instructions part-sequence fs->mutation)]
+        ((apply comp (map #(if (seq? %) 
+                    (apply partial %) 
+                    %) linear-list)) part-sequence)))
+
 ;TODO: mutate/compose-mutation must implement a macro that get's composed out of the formal system aswell
 ; to create different kinds of evolution/mutations on single entries or entire "levels"
 ; must operate with sequence and collection functions.
@@ -61,3 +93,11 @@
 ; Similar to graphical translation, but instead of list in it is a nested list "(transform (property (unit 433) 23) 23)" for one scope
 (defn meta-mutate [structure]
     (eval (build-mutation-algorithm structure)))
+
+
+(defn test-mutate-simple []
+    (compose-mutation-sequence (:sequence example/simple)))
+
+
+(defn test-mutate-complex []
+    (meta-mutate example/complex))

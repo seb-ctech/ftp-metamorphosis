@@ -104,7 +104,7 @@
             prefix-translated))))
           
 (defn test-translation []
-    (recursive-translation (:sequence example/sample-structure)))
+    (recursive-translation (:sequence example/complex)))
 
 ;Not the right use-case for a macro, because of the way I pass the argument, which is not a form and needs to be evaluated to the data structure!
 (defn make-quil

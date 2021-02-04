@@ -4,7 +4,6 @@
 (def test-input in/test-input)
 (def input-signals in/input-signals)
 
-
 (defn strongest-signal [input]
     (reduce #(if (> (:intensity %2) (:intensity %1))
                     %2
@@ -53,6 +52,7 @@
     (loop [remaining sequence
             amount {:class :amount :index 0}
             instructions []]
+        (println sequence)
         (if (> (count remaining) 0)
             (let [next (first remaining)]
                 (if (= (:class next) :amount)
