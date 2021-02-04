@@ -42,30 +42,12 @@
 
 (defn higher-order-> []
     (:sequence (f/build-random-axiom 2)))
-
-(defn mutate 
-    [structure rate]
-    (loop [sequence (:sequence structure) 
-           new-sequence [] ]
-        (if (> (count sequence) 0)
-            (let [next (first sequence)
-                  remaining (rest sequence)]
-                (if (has-lower-level? next)
-                    (recur remaining (conj new-sequence (mutate next rate)))
-                    (if (< (rand) rate)
-                        (case (rand-int 3)
-                            0 (recur remaining new-sequence) ;Remove entry
-                            1 (recur remaining (conj (conj new-sequence next) next)) ;Dublicate entry
-                            2 (recur remaining (conj new-sequence (change-letter next)))) ;Change entry
-                        (recur remaining (conj new-sequence next)))))
-            (assoc structure :sequence new-sequence))))
  
 ;TODO: Compose mutations needs to be repeated on lower levels
 ; for example: Phrase 2 of Sentence 1 has two repetitions of motif and Phrase 1 of Sentence 2 has four repetitions of motif
             
 (defn compose-mutations [structure]
-    (let [times (inc (rand-int 3))
-          variation (higher-order->)]
+    (let [variation (higher-order->)]
         (loop [remaining times composition []]
             (if (> remaining 0)
                 (recur 
@@ -76,7 +58,7 @@
                 composition))))  
 
 
-(defn compose-mutation-sequence
+(defn meta-mutate-sequence
     "Function that makes a composed function out of a partial sequence and that takes the same sequence as input" 
     [rate part-sequence]
     (let [linear-list (meta-t/fs-sequence->instructions part-sequence fs->mutation)]
@@ -86,16 +68,27 @@
                             %) rate) 
                         linear-list)) part-sequence)))
 
-(defn build-mutation-algorithm [sequence]
-    )
+(defn recursive-sequence-mutation [sequence]
+    (meta-mutate-sequence 0.3 (map #(if (has-lower-level? %)
+                                        (recursive-sequence-mutation %)
+                                        %)
+        sequence)))
 
 ; Similar to graphical translation, but instead of list in it is a nested list "(transform (property (unit 433) 23) 23)" for one scope
 (defn meta-mutate [structure]
-    (eval (build-mutation-algorithm structure)))
+    (let [variation (higher-order->)]
+        (loop [remaining times composition []]
+            (if (> remaining 0)
+                (recur 
+                    (dec remaining)
+                    (conj 
+                        (reduce conj composition variation) 
+                        (mutate structure 0.3)))
+                composition))))
 
 
 (defn test-mutate-simple []
-    (compose-mutation-sequence 0.1 (:sequence example/simple)))
+    (meta-mutate example/simple))
 
 
 (defn test-mutate-complex []
