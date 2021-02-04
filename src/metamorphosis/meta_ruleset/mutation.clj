@@ -9,19 +9,20 @@
 (defn glue []
     (:sequence (f/build-random-axiom 2)))
 
-;TODO: Implement a few functions that operate on sequences. 
+;TODO: Implement a few functions that operate on sequences.
+; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
 ;Unit: creates something new, Transform: Changes the sequence, Property: applies some overall change to the structure
 (def fs->mutation {
     :unit [
-        (list (fn [n sequence] (identity sequence)) ['(1)]) ; [ () ] TODO: add vectors of argument lists
+        (list (fn [n rate sequence] (identity sequence)) ['(0.1)])
     ]
 
     :transform [
-        (list (fn [n sequence] (identity sequence)) ['(2)])
+        (list (fn [n rate sequence] (identity sequence)) ['(0.1)])
     ]
 
     :property [
-        (list (fn [ sequence] (identity sequence)))
+        (list (fn [n rate sequence] (identity sequence)) ['(0.1)])
     ]
 })
 
@@ -77,15 +78,13 @@
 
 (defn compose-mutation-sequence
     "Function that makes a composed function out of a partial sequence and that takes the same sequence as input" 
-    [part-sequence]
+    [rate part-sequence]
     (let [linear-list (meta-t/fs-sequence->instructions part-sequence fs->mutation)]
-        ((apply comp (map #(if (seq? %) 
-                    (apply partial %) 
-                    %) linear-list)) part-sequence)))
-
-;TODO: mutate/compose-mutation must implement a macro that get's composed out of the formal system aswell
-; to create different kinds of evolution/mutations on single entries or entire "levels"
-; must operate with sequence and collection functions.
+        ((apply comp (map 
+                        #(partial (if (seq? %) 
+                            (apply partial %) 
+                            %) rate) 
+                        linear-list)) part-sequence)))
 
 (defn build-mutation-algorithm [sequence]
     )
@@ -96,7 +95,7 @@
 
 
 (defn test-mutate-simple []
-    (compose-mutation-sequence (:sequence example/simple)))
+    (compose-mutation-sequence 0.1 (:sequence example/simple)))
 
 
 (defn test-mutate-complex []
