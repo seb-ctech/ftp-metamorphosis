@@ -52,7 +52,6 @@
     (loop [remaining sequence
             amount {:class :amount :index 0}
             instructions []]
-        (println sequence)
         (if (> (count remaining) 0)
             (let [next (first remaining)]
                 (if (= (:class next) :amount)
