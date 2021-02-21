@@ -7,6 +7,7 @@
 
 (def resolution [500 500])
 (def evolving-interval 20)
+(def max-generations 5)
 
 (defn init []
   (let [state (gsys/setup-sketch)]
@@ -22,10 +23,10 @@
           state (gsys/update-graphics (u/update-util state))]
       (if restart?
         (assoc state :theorem (msys/first-generation new-input))
-        (if (and (contains? state :theorem) (u/time-up? state))
+        (if (and (contains? state :theorem) (u/time-up? state) (<= (get-in state [:theorem :gen]) max-generations))
             (assoc state :theorem (msys/evolve-next-generation (:theorem state)))
-           state))))
-    
+            state))))
+
 (defn -main [& args]
   (let [setup (if (nil? args) 
                 init
