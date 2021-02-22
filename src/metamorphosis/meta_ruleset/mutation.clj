@@ -3,21 +3,46 @@
               [metamorphosis.meta-ruleset.formal-system-example-structure :as example]
               [metamorphosis.meta-ruleset.translation :as meta-t]))
 
-;TODO: A sequence of commands that are needed to make the evolution to the next level possible:
-; an additional helper class, that translates to a set of instructions, that make the transition to a higher scope possible 
-;and some scaling/translation for graphic implementation
-(defn glue []
-    (:sequence (f/build-random-axiom 2))) ;TODO: Make deterministic
+(defn glue 
+    ([n]
+     {:class :glue :values (list n)})
+    ([n i]
+     {:class :glue :values (list n i)}))
 
-;TODO: Implement a few functions that operate on sequences.
-; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
-;Unit: creates something new, Transform: Changes the sequence, Property: applies some overall change to the structure
+(defn repetitions [structure]
+    (inc (rand-int 3)))
 
 (defn has-lower-level? [entry]
     (and (contains? entry :gen)))
 
-;TODO: Should I remove mutation rate. It is non-deterministic because it implies randomness/chance.
+(defn meta-rate 
+    "Function that given a sequence calculates the mutation rate of the lower scope based on a ratio between transform and property indeces"
+    [sequence]
+    (let [transforms (inc (apply + (map #(:index %) 
+                                        (filter #(= (:class %) :transform) sequence))))
+          properties (inc (apply + (map #(:index %) 
+                                        (filter #(= (:class %) :property) sequence))))]
+    (float (/ (min transforms properties) (max transforms properties)))))
+
+; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
+; Unit: creates something new, 
+;Transform: Changes the sequence, 
+; TODO: Property: applies some overall change to the next units (lower level sequences)
+; TODO: Make exception for glue
+; TODO: eliminate parameters. Just use Rate. 
+
+(defmacro ignore-glue [entry form]
+    `(if (= (:class ~entry) :glue) ~entry ~form))
+
 (def fs->mutation {
+    :glue [
+        (list
+            (fn 
+                ([n rate sequence]
+                sequence)
+                ([n x rate sequence]
+                    sequence)))
+    ]
     :unit [
         ; Drop entry at target index
         (list 
@@ -59,39 +84,42 @@
         ; Decrement all by 1
         (list 
             (fn [rate sequence]
-                (map #(if (has-lower-level? %)
+                (map #(ignore-glue 
+                        %
+                        (if (has-lower-level? %)
                             %
                             (assoc % :index
                                 (let [i (:index %)] 
                                     (if (> i 0)
                                         (dec i)
-                                        i))))
+                                        i)))))
                      sequence)))
         ; Increment all by 1
         (list 
             (fn [rate sequence]
-                (map #(if (has-lower-level? %)
-                            %
-                            (assoc % :index
-                                (let [i (:index %)]
-                                    (if (< i 5)
-                                        (inc i)
-                                        i)))))
-                     sequence))
+                (map #(ignore-glue 
+                            % 
+                            (if (has-lower-level? %)
+                                %
+                                (assoc % :index
+                                    (let [i (:index %)]
+                                        (if (< i 5)
+                                            (inc i)
+                                            i)))))
+                     sequence)))
     ]
 })
 
-(defn change-letter [letter]
-    (f/random-entry))
-
-(defn higher-order-> []
-    (:sequence (f/build-random-axiom 2))) ;TODO: Make deterministic
+;TODO: Make deterministic
+(defn higher-order-> [theorem]
+    (:sequence (f/build-random-axiom 2)))
  
 ; How do you avoid recursion in here? IMPORTART: To make the point between meta and recursion
 ; Solution: It must be ignored and not resolved! So I need to filter out lower levels on translation and keep it in when its passed as input
 (defn meta-mutate-sequence
     "Function that makes a composed function out of a partial sequence and that takes the same sequence as input" 
-    [rate part-sequence]
+    [part-sequence]
+    ;(println "Meta Sequence: " part-sequence "\n")
     (let [linear-command-list (meta-t/fs-sequence->instructions 
                                     (filter #(not (has-lower-level? %)) 
                                             part-sequence) 
@@ -101,8 +129,8 @@
             (map 
                 #(partial (if (seq? %) 
                               (apply partial %) 
-                              %) rate) 
-                linear-command-list)) 
+                              %) (meta-rate part-sequence))
+                linear-command-list))
         part-sequence)))
 
 (defn recursive-system-mutation 
@@ -114,7 +142,6 @@
      :sequence (into 
                     (vector) 
                     (meta-mutate-sequence 
-                        0.3 
                         (map #(if (has-lower-level? %)
                                   (recursive-system-mutation %)
                                   %)
@@ -123,9 +150,14 @@
 ; Similar to graphical translation, but instead of list in it is a nested list "(transform (property (unit 433) 23) 23)" for one scope
 ; TODO: Make repetition deterministic
 (defn meta-mutate [structure]
-    (let [times (inc (rand-int 3))
+    (let [times (repetitions structure)
           old structure]
-        (loop [remaining times composition (conj (into (glue) (higher-order->)) old)]
+        (loop [remaining times 
+               composition (conj 
+                            (into (vector) (cons
+                                (glue times) 
+                                (higher-order-> structure))) 
+                            old)]
             (if (> remaining 0)
                 (recur 
                     (dec remaining)
@@ -133,7 +165,7 @@
                         (reduce 
                             conj 
                             composition 
-                            (into (glue) (higher-order->))) 
+                            (into (vector) (cons (glue times remaining) (higher-order-> structure)))) 
                         (recursive-system-mutation structure)))
                 composition))))
 

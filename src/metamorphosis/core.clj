@@ -16,9 +16,10 @@
                     :target evolving-interval})
             :last-gen 0)))
 
+
 (defn metamorph-loop
   [state]
-    (let [event (esys/listen-for-event)
+    (let [event 0
           restart? (:new-input? event)
           new-input (:input event)
           state (gsys/update-graphics (u/update-util state))]

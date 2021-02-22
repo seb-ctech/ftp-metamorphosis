@@ -43,7 +43,5 @@
                             (random-entry)))
                  (build-axiom sequence)))))
 
-;TODO: Implement function to create axiom from input-data-structure provided by the "event-listener" module
-
 
 

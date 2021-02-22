@@ -36,14 +36,18 @@
 
 (defn formal-system->form 
     [entry translation-unit amount]
-    (let [class (:class entry)
-          index (:index entry)
+    (let [{class :class
+          index :index} entry
           amount (:index amount)
-          instruction (next-possible-entry (translation-unit class) index)
+          instruction (if (= class :glue) 
+                          (first (translation-unit class))
+                          (next-possible-entry (translation-unit class) index))
           params (when (second instruction) (next-possible-entry (second instruction) amount))]
-          (if params
-            (cons (first instruction) params)
-            (first instruction))))
+          (if (= class :glue)
+              (cons (first instruction) (:values entry))
+              (if params
+                (cons (first instruction) params)
+                (first instruction)))))
 
 
 (defn fs-sequence->instructions

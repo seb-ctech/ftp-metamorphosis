@@ -4,6 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.10.1"]
+                 [org.clojure/core.async "1.3.610"]
                  [quil "3.1.0"]
                  [org.clojars.noodle-incident/leap-linux-native-deps "1.0.0"]
                  [rogerallen/leaplib "2.0.2"]]

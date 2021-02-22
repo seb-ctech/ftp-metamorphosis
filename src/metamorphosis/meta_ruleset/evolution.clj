@@ -5,10 +5,8 @@
 
 (defn next-step [structure]
     (println "Next generation")
-    (reduce #(assoc %1 
-                    :sequence (conj (:sequence %1) %2)) 
-        {:gen (inc (:gen structure)) :sequence (conj (m/glue) structure)} 
-        (m/meta-mutate structure)))
+        {:gen (inc (:gen structure)) 
+         :sequence (m/meta-mutate structure)})
 
 ;==== TEST FUNCTIONS ======
 

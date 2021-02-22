@@ -1,7 +1,8 @@
 (ns metamorphosis.graphics.core
     (:require [quil.core :as q]
               [quil.middleware :as m]
-              [metamorphosis.graphics.translation :as t])
+              [metamorphosis.graphics.translation :as t]
+              [metamorphosis.event-listener.input.keyboard :as key])
     (:gen-class))
 
 ;TODO: Find visual translation made out of composable functions that is fitting for a beginning motif. Ideally 3D:
@@ -24,6 +25,7 @@
     (q/background 0))
 
 (defn render-generation [instructions]
+    ;(println instructions)
     (eval instructions))
 
 (defn setup-sketch []
@@ -61,4 +63,5 @@
             :setup setup
             :update update-loop
             :draw draw-sketch
+            :key-pressed key/key-pressed
             :middleware [m/fun-mode]))
