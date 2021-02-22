@@ -11,9 +11,10 @@
 
 (defn init []
   (let [state (gsys/setup-sketch)]
-    (assoc state :time {
+    (assoc (assoc state :time {
                     :count 0 
-                    :target evolving-interval})))
+                    :target evolving-interval})
+            :last-gen 0)))
 
 (defn metamorph-loop
   [state]

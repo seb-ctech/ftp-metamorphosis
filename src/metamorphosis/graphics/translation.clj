@@ -108,6 +108,7 @@
 (defn make-quil
     "This is a function that transforms the formal system to valid quil instructions"
     [theorem]
+    (println "Translating formal system to quil instructions...")
     (let [instructions (recursive-translation (:sequence theorem))]
         (cons 'do instructions)))
 

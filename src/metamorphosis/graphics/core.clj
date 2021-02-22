@@ -23,14 +23,24 @@
 (defn render-shader [shader]
     (q/background 0))
 
-(defn render-generation [generation]
-    (eval (t/make-quil generation)))
+(defn render-generation [instructions]
+    (eval instructions))
 
 (defn setup-sketch []
     {})
 
 (defn update-graphics [state]
-    state)
+    (println "Rendering gen: " (get-in state [:theorem :gen]))
+    (let [instructions 
+            (if
+                (contains? state :g-instructions)
+                (if 
+                    (not= (:last-gen state) (get-in state [:theorem :gen]))
+                    (t/make-quil (:theorem state))
+                    (:g-instructions state))
+                (t/make-quil (:theorem state)))]
+        (assoc (assoc state :g-instructions instructions)
+                :last-gen (get-in state [:theorem :gen]))))
 
 ;renders the state that was updated
 (defn draw-sketch [state]
@@ -38,7 +48,7 @@
     (if (= (:mode state) :glsl)
         (render-shader (:shader state))
         (when (contains? state :theorem)
-            (render-generation (:theorem state)))))
+            (render-generation (:g-instructions state)))))
 
 ; Programmatic creation of a quil sketch
 (defn start-visualization 
