@@ -10,7 +10,11 @@
         (assoc state :time new-time)))
 
 (defn reset-time [state]
-    (assoc-in state [:time :count] 0))
+    (let [time (:time state)]
+        (assoc state
+            :time (assoc time
+                    :count 0
+                    :finished? false))))
 
 (defn update-util [state]
     (handle-timer state))

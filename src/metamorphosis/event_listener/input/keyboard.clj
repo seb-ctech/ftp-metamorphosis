@@ -13,13 +13,11 @@
             :break)))
 
 (defn key-pressed [state key]
-    (println "Pressed: " key)
     (assoc state 
         :triggered? (not (:recording? state)) 
         :key-pressed key))
 
 (defn key-released [state key]
-    (println "Release: " key)
     (if (:recording? state)
         (assoc state :key-released key)
         state))

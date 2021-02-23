@@ -9,8 +9,6 @@
 
 (def input-listen-interval 100)
 
-
-
 (defn command-line [string]
     (in/command-line string))
 
@@ -18,7 +16,9 @@
     (let [length (apply + 
                         (map #(:duration %) 
                               sequence))]
-    (map #(assoc % :duration (/ (:duration %) length)) 
+    (map #(assoc % 
+            :duration (/ (:duration %) length)
+            :intensity 0.5) 
          sequence)))
 
 ;TODO: Implement an asynchronous event-listener that can be used as wrapper to any input form (This Layer)
@@ -35,11 +35,16 @@
                 (assoc state :event-recorder (in/record-input) :input-sequence []))
             (if (:event-recorder state)
                 (if (realized? (:event-recorder state))
-                    (dissoc (assoc state :done? true :recording? false :input-sequence (:input-sequence state)) :event-recorder)
+                    (dissoc 
+                        (assoc state 
+                            :done? true 
+                            :recording? false 
+                            :input-sequence (process-input-sequence (:input-sequence state))) 
+                        :event-recorder)
                     (in/basic-keyboard state))
                 state))))
 
 (defn get-event [state]
-    (println (:input-sequence state))
-    {:new-input? (:done? state) :input (:input-sequence state)} )
+    {:new-input? (:done? state) 
+     :input (:input-sequence state)})
 

@@ -6,8 +6,8 @@
   (:gen-class))
 
 (def resolution [1000 1000])
-(def evolving-interval 20)
-(def max-generations 5)
+(def evolving-interval 120)
+(def max-generations 1)
 
 (defn init []
   (let [state (gsys/setup-sketch)]
@@ -28,11 +28,10 @@
           new-input (:input event)]
       (if restart?
         (do (println "Restarting! \n \n")
-            (println state)
-            (u/reset-time state
-              ;(assoc state :theorem (msys/first-generation new-input))
-              ))
-        (if (and (contains? state :theorem) (u/time-up? state) (<= (get-in state [:theorem :gen]) max-generations))
+            (u/reset-time (assoc state :theorem (msys/first-generation new-input))))
+        (if (and (contains? state :theorem) 
+                 (u/time-up? state) 
+                 (< (get-in state [:theorem :gen]) max-generations))
             (assoc state :theorem (msys/evolve-next-generation (:theorem state)))
             state))))
 
@@ -41,13 +40,3 @@
                 init
                 #(assoc (init) :mode (first args)))]
     (gsys/start-visualization resolution setup metamorph-loop)))
-
-;=== Entry point for Developing without event-listener ====
-
-(defn start 
-  ([] (gsys/start-visualization resolution #(assoc (init) :theorem (msys/build-random-axiom)) metamorph-loop))
-  ([input] 
-      (gsys/start-visualization resolution #(assoc (init) :theorem (msys/first-generation 
-                                                                      (if (and (keyword? input) (= input :standard))  
-                                                                          esys/test-input
-                                                                          (esys/command-line input)))) metamorph-loop)))
