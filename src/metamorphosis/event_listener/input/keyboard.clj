@@ -1,9 +1,10 @@
 (ns metamorphosis.event-listener.input.keyboard
     (:require [clojure.core.async :as async]))
 
-(defn process-key [key state]
-    (let [{input-sequence :input-sequence} state]
-        input-sequence))
+(defn process-key [pressed released]
+    (if (or (= pressed released) (nil? pressed))
+        :break
+        :A))
 
 (defn key-pressed [state key]
     (println "Pressed: " key)

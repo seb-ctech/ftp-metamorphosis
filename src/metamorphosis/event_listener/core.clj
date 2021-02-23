@@ -9,9 +9,7 @@
 
 (def input-listen-interval 100)
 
-(defn basic-keyboard [state]
-    (println (:key-pressed state))
-    state)
+
 
 (defn command-line [string]
     (in/command-line string))
@@ -28,17 +26,20 @@
 
 ;This blocks the whole program!
 (defn listen-for-event [state]
-    (let [state (if (:done? state) (assoc state :done? false) state)]
+    (let [state (if (:done? state) 
+                    (assoc state :done? false) 
+                    state)]
         (if (:triggered? state)
             (let [state (assoc state :triggered? false :recording? true)]
                 (println "Triggered!")
-                (assoc state :event-recorder (in/record-input)))
+                (assoc state :event-recorder (in/record-input) :input-sequence []))
             (if (:event-recorder state)
                 (if (realized? (:event-recorder state))
                     (dissoc (assoc state :done? true :recording? false :input-sequence (:input-sequence state)) :event-recorder)
-                    (basic-keyboard state))
+                    (in/basic-keyboard state))
                 state))))
 
 (defn get-event [state]
+    (println (:input-sequence state))
     {:new-input? (:done? state) :input (:input-sequence state)} )
 

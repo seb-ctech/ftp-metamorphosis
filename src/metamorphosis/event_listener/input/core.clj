@@ -1,6 +1,7 @@
 (ns metamorphosis.event-listener.input.core
     (:require [metamorphosis.meta-ruleset.formal-system :as f]
-              [metamorphosis.event-listener.input.command-line :as cl]))
+              [metamorphosis.event-listener.input.command-line :as cl]
+              [metamorphosis.event-listener.input.keyboard :as key]))
 
 ;;=== PROTOTYPE OF ABSTRACT INPUT DATA-STRUCTURE ===
 
@@ -20,8 +21,25 @@
 
 ; ==============================================
 
-(def input-interval 2000)
+(def input-interval 1000)
 (def a-input "a")
+
+
+(defn basic-keyboard [state]
+    (let [pressed (get-in state [:key-pressed :key])
+          released (get-in state [:key-released :key])
+          signal (key/process-key pressed released)
+          old-sequence (:input-sequence state)
+          length (count old-sequence)
+          sequence (if (= (count old-sequence) 0)
+                       (conj old-sequence {:signal signal :duration 1})
+                       (if (= (:signal (last old-sequence)) signal)
+                           (update-in old-sequence [(dec length) :duration] inc)
+                           (conj old-sequence {:signal signal :duration 1})))]
+        (assoc state 
+               :input-sequence sequence
+               :key-pressed (if (= signal :break) nil pressed)
+               :key-released (if (= signal :break) nil released))))
 
 (defn build-input 
     [input-queue timer]
