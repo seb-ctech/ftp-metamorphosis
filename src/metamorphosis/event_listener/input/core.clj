@@ -38,8 +38,9 @@
                            (conj old-sequence {:signal signal :duration 1})))]
         (assoc state 
                :input-sequence sequence
-               :key-pressed (if (= signal :break) nil pressed)
-               :key-released (if (= signal :break) nil released))))
+               :key-pressed (if (= signal :break) nil (:key-pressed state))
+               :key-released nil
+               )))
 
 (defn build-input 
     [input-queue timer]

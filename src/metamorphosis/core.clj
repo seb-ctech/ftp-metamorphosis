@@ -28,7 +28,10 @@
           new-input (:input event)]
       (if restart?
         (do (println "Restarting! \n \n")
-            (assoc state :theorem (msys/first-generation new-input)))
+            (println state)
+            (u/reset-time state
+              ;(assoc state :theorem (msys/first-generation new-input))
+              ))
         (if (and (contains? state :theorem) (u/time-up? state) (<= (get-in state [:theorem :gen]) max-generations))
             (assoc state :theorem (msys/evolve-next-generation (:theorem state)))
             state))))

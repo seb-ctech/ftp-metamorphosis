@@ -4,8 +4,13 @@
     (let [time (:time state)
           inc-time (inc (:count time))
           done? (>= inc-time (:target time))
-          new-time (assoc (assoc time :finished? done?) :count (if done? 0 inc-time))]
+          new-time (assoc time 
+                          :finished? done? 
+                          :count (if done? 0 inc-time))]
         (assoc state :time new-time)))
+
+(defn reset-time [state]
+    (assoc-in state [:time :count] 0))
 
 (defn update-util [state]
     (handle-timer state))

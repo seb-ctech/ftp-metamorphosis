@@ -4,7 +4,13 @@
 (defn process-key [pressed released]
     (if (or (= pressed released) (nil? pressed))
         :break
-        :A))
+        (case pressed
+            :q :A
+            :w :B
+            :e :C
+            :r :D
+            :t :E
+            :break)))
 
 (defn key-pressed [state key]
     (println "Pressed: " key)
