@@ -32,7 +32,7 @@
     {})
 
 (defn update-graphics [state]
-    (println "Rendering gen: " (get-in state [:theorem :gen]))
+    ;(println "Rendering gen: " (get-in state [:theorem :gen]))
     (let [instructions 
             (if
                 (contains? state :g-instructions)
@@ -64,4 +64,5 @@
             :update update-loop
             :draw draw-sketch
             :key-pressed key/key-pressed
+            :key-released key/key-released
             :middleware [m/fun-mode]))

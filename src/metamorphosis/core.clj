@@ -5,7 +5,7 @@
             [metamorphosis.meta-ruleset.core :as msys])
   (:gen-class))
 
-(def resolution [500 500])
+(def resolution [1000 1000])
 (def evolving-interval 20)
 (def max-generations 5)
 
@@ -16,15 +16,18 @@
                     :target evolving-interval})
             :last-gen 0)))
 
-
 (defn metamorph-loop
   [state]
-    (let [event 0
+    (let [state (-> state
+                    u/update-util
+                    gsys/update-graphics
+                    esys/listen-for-event)
+          event (esys/get-event state)
           restart? (:new-input? event)
-          new-input (:input event)
-          state (gsys/update-graphics (u/update-util state))]
+          new-input (:input event)]
       (if restart?
-        (assoc state :theorem (msys/first-generation new-input))
+        (do (println "Restarting! \n \n")
+            (assoc state :theorem (msys/first-generation new-input)))
         (if (and (contains? state :theorem) (u/time-up? state) (<= (get-in state [:theorem :gen]) max-generations))
             (assoc state :theorem (msys/evolve-next-generation (:theorem state)))
             state))))

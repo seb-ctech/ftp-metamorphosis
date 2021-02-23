@@ -31,11 +31,8 @@
                  (Thread/sleep input-interval)
                  (build-input (conj input-queue a-input) timer))))
  
-(defn record-input 
-    ([time-frame]
-        (record-input time-frame build-input))
-    ([time-frame input]
-    (input [] (clojure.core/future (Thread/sleep time-frame)))))
+(defn record-input []
+    (clojure.core/future (Thread/sleep input-interval) (println "Finished Recording")))
 
 (defn command-line [string]
     (cl/string->input string))
