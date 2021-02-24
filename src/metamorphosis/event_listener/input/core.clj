@@ -10,7 +10,7 @@
 ; A Signal represent a discrete input form that can be distinguished from others
 
 
-(def input-signals [:A :B :C])
+(def input-signals [:A :B :C :D :E])
 
 (def test-input [
     {:signal :A :intensity 0.1 :duration 1/10}
@@ -21,7 +21,7 @@
 
 ; ==============================================
 
-(def input-interval 1000)
+(def input-interval 3000)
 (def a-input "a")
 
 
@@ -50,6 +50,15 @@
     (clojure.core/future 
         (Thread/sleep input-interval) 
         (println "Finished Recording")))
+
+(defn process-input-sequence [sequence]
+    (let [length (apply + 
+                        (map #(:duration %) 
+                                sequence))]
+    (map #(assoc % 
+            :duration (/ (:duration %) length)
+            :intensity (rand 1)) 
+            sequence)))
 
 (defn command-line [string]
     (cl/string->input string))

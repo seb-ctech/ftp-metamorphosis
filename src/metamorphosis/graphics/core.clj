@@ -28,6 +28,7 @@
     "Function that evaluates the instruction set to render the current generation"
     [instructions]
     ;(println instructions)
+    (q/translate (/ (q/width) 2) (/ (q/height) 2))
     (eval instructions))
 
 (defn setup-sketch 
@@ -45,10 +46,13 @@
             (if 
                 (not= (:last-gen state) (get-in state [:theorem :gen]))
                 (let [new (t/make-quil (:theorem state))]
-                    (println new)
+                    (println "Generation: " (get-in state [:theorem :gen]))
+                    (println (get-in state [:theorem :sequence]))
                     new)
                 (:g-instructions state))
-            (t/make-quil (:theorem state)))]
+            (do (println "Generation: " (get-in state [:theorem :gen]))
+                (println (get-in state [:theorem :sequence]))
+                (t/make-quil (:theorem state))))]
     (assoc (assoc state :g-instructions instructions)
             :last-gen (get-in state [:theorem :gen]))))
 

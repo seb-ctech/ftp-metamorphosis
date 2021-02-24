@@ -6,9 +6,9 @@
 (defn glue 
     "A function that returns an addition helper class that behaves as a fix and is aware of all copies"
     ([n]
-     {:class :glue :values (list n)})
+     {:class :glue :values (list (inc n))})
     ([n i]
-     {:class :glue :values (list n i)}))
+     {:class :glue :values (list (inc n) i)}))
 
 (defn has-lower-level? [entry]
     "A function that returns true of false, wether an entry has a lower-level sequence"
@@ -164,10 +164,8 @@
           old structure]
         (loop [remaining times 
                composition (conj 
-                            (into (vector) (cons
-                                (glue times) 
-                                (higher-order-> structure))) 
-                            old)]
+                                [(glue times)]
+                                old)]
             (if (> remaining 0)
                 (recur 
                     (dec remaining)

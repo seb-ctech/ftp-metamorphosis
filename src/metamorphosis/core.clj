@@ -6,8 +6,8 @@
   (:gen-class))
 
 (def resolution [1000 1000])
-(def evolving-interval 120)
-(def max-generations 4)
+(def evolving-interval 20)
+(def max-generations 2)
 
 (defn init 
   "Function that sets the initial state for the program"

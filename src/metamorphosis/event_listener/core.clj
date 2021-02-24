@@ -11,15 +11,6 @@
 (defn command-line [string]
     (in/command-line string))
 
-(defn process-input-sequence [sequence]
-    (let [length (apply + 
-                        (map #(:duration %) 
-                              sequence))]
-    (map #(assoc % 
-            :duration (/ (:duration %) length)
-            :intensity 0.5) 
-         sequence)))
-
 (defn listen-for-event 
     "A function that handles an asynchronous timer and sets important variables for the handling of input"
     [state]
@@ -36,7 +27,7 @@
                         (assoc state 
                             :done? true 
                             :recording? false 
-                            :input-sequence (process-input-sequence (:input-sequence state))) 
+                            :input-sequence (in/process-input-sequence (:input-sequence state))) 
                         :event-recorder)
                     (in/basic-keyboard state))
                 state))))
