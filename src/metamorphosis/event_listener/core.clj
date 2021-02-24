@@ -1,8 +1,7 @@
 (ns metamorphosis.event-listener.core
     (:require 
         [clojure.core.async :as async]
-        [metamorphosis.event-listener.input.core :as in]
-        [metamorphosis.meta-ruleset.core :as msys])
+        [metamorphosis.event-listener.input.core :as in])
     (:gen-class))
 
 (def test-input in/test-input)
@@ -21,11 +20,9 @@
             :intensity 0.5) 
          sequence)))
 
-;TODO: Implement an asynchronous event-listener that can be used as wrapper to any input form (This Layer)
-;TODO: Remove msys after implementing
-
-;This blocks the whole program!
-(defn listen-for-event [state]
+(defn listen-for-event 
+    "A function that handles an asynchronous timer and sets important variables for the handling of input"
+    [state]
     (let [state (if (:done? state) 
                     (assoc state :done? false) 
                     state)]
@@ -44,7 +41,10 @@
                     (in/basic-keyboard state))
                 state))))
 
-(defn get-event [state]
+(defn get-event 
+    "A function that returns true, when a new input was produced and the new input"
+    [state]
+    ;(println (:input-sequence state))
     {:new-input? (:done? state) 
      :input (:input-sequence state)})
 

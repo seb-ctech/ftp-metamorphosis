@@ -5,9 +5,7 @@
               [metamorphosis.event-listener.input.keyboard :as key])
     (:gen-class))
 
-;TODO: Find visual translation made out of composable functions that is fitting for a beginning motif. Ideally 3D:
-;      1. Every generation represents one layer of complexity contained in higher levels
-;      2. One Layer of complexity is made out of an algorithm that contains the algorithms of the lower levels
+; ====== GLSL STUFF for potential later implementations ========
 
 (def fragment-shader "test.frag")
 
@@ -24,36 +22,52 @@
 (defn render-shader [shader]
     (q/background 0))
 
-(defn render-generation [instructions]
+;========================================================
+
+(defn render-generation 
+    "Function that evaluates the instruction set to render the current generation"
+    [instructions]
     ;(println instructions)
     (eval instructions))
 
-(defn setup-sketch []
+(defn setup-sketch 
+    "A function that is called as part of the initialization process and sets important graphical information"
+    []
     {})
 
-(defn update-graphics [state]
-    ;(println "Rendering gen: " (get-in state [:theorem :gen]))
-    (let [instructions 
-            (if
-                (contains? state :g-instructions)
-                (if 
-                    (not= (:last-gen state) (get-in state [:theorem :gen]))
-                    (t/make-quil (:theorem state))
-                    (:g-instructions state))
-                (t/make-quil (:theorem state)))]
-        (assoc (assoc state :g-instructions instructions)
-                :last-gen (get-in state [:theorem :gen]))))
 
-;renders the state that was updated
-(defn draw-sketch [state]
+(defn handle-instructions 
+    "A function that manages the translation of instructions and caches already translated instructions"
+    [state]
+    (let [instructions 
+        (if
+            (contains? state :g-instructions)
+            (if 
+                (not= (:last-gen state) (get-in state [:theorem :gen]))
+                (let [new (t/make-quil (:theorem state))]
+                    (println new)
+                    new)
+                (:g-instructions state))
+            (t/make-quil (:theorem state)))]
+    (assoc (assoc state :g-instructions instructions)
+            :last-gen (get-in state [:theorem :gen]))))
+
+(defn update-graphics 
+    "A wrapper function that contains the main graphical updates."
+    [state]
+    (handle-instructions state))
+
+(defn draw-sketch 
+    "Main function that renders a frame"
+    [state]
     (q/background 0)
     (if (= (:mode state) :glsl)
         (render-shader (:shader state))
         (when (contains? state :theorem)
             (render-generation (:g-instructions state)))))
 
-; Programmatic creation of a quil sketch
 (defn start-visualization 
+    "A function that builds a graphical container as quil sketch and passes in the most important high-level functions"
     [size setup update-loop]
         (q/sketch 
             :size size 

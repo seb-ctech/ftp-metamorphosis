@@ -11,19 +11,22 @@
 ; PROPERTY: Some property that the next units will have
 ; AMOUNT: Some amount that either the next Unit, Transform or Property will have. Default is "0"
 
-(def example-theorem {:gen 0 
-                      :sequence [{:class :transform :index 1}
-                                 {:class :unit :index 2}
-                                 {:class :amount :index 1}
-                                 {:class :transform :index 1}
-                                 {:class :property :index 2}
-                                 {:class :property :index 0}
-                                 {:class :amount :index 2}]})
-
-
-; The alphabet is made out of the different classes that commands can have
-
 (def alphabet [:unit :transform :property :amount])
+
+(def example-theorem {:gen 0 
+                      :sequence [
+                            {:class :amount, :index 1} 
+                            {:class :unit, :index 0} 
+                            {:class :amount, :index 0} 
+                            {:class :property, :index 1} 
+                            {:class :amount, :index 1} 
+                            {:class :unit, :index 2} 
+                            {:class :amount, :index 0} 
+                            {:class :property, :index 0} 
+                            {:class :amount, :index 0} 
+                            {:class :property, :index 1} 
+                            {:class :amount, :index 0} 
+                            {:class :unit, :index 2}]})
 
 (defn random-entry []
     {:class (get alphabet 
@@ -31,6 +34,7 @@
      :index (rand-int 5)})
 
 (defn build-axiom [sequence]
+    "Function that builds an axiom out of a sequence by appending gen 0"
     {:gen 0 :sequence sequence})
 
 (defn build-random-axiom 

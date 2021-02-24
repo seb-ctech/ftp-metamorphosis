@@ -4,19 +4,19 @@
               [metamorphosis.meta-ruleset.translation :as meta-t]))
 
 (defn glue 
+    "A function that returns an addition helper class that behaves as a fix and is aware of all copies"
     ([n]
      {:class :glue :values (list n)})
     ([n i]
      {:class :glue :values (list n i)}))
 
-(defn repetitions [structure]
-    (inc (rand-int 3)))
-
 (defn has-lower-level? [entry]
+    "A function that returns true of false, wether an entry has a lower-level sequence"
     (and (contains? entry :gen)))
 
 (defn meta-rate 
-    "Function that given a sequence calculates the mutation rate of the lower scope based on a ratio between transform and property indeces"
+    "Function that given a sequence calculates the mutation rate 
+    of the lower scope based on a ratio between transform and property indeces"
     [sequence]
     (let [transforms (inc (apply + (map #(:index %) 
                                         (filter #(= (:class %) :transform) sequence))))
@@ -28,10 +28,10 @@
 ; Unit: creates something new, 
 ;Transform: Changes the sequence, 
 ; TODO: Property: applies some overall change to the next units (lower level sequences)
-; TODO: Make exception for glue
 ; TODO: eliminate parameters. Just use Rate. 
 
 (defmacro ignore-glue [entry form]
+    "A macro that can be used to make an if form as wrapper to return :glue unmodified"
     `(if (= (:class ~entry) :glue) ~entry ~form))
 
 (def fs->mutation {
@@ -110,14 +110,21 @@
     ]
 })
 
+;TODO: Implement
+(defn repetitions [structure]
+    "Function that uses a deterministic algorithm to determine an amount between 1 and 7 for the next step"
+    (inc (rand-int 3)))
+
 ;TODO: Make deterministic
 (defn higher-order-> [theorem]
+    "Function that computes a sequence of one to three random classes by some deterministic algorithm"
     (:sequence (f/build-random-axiom 2)))
  
 ; How do you avoid recursion in here? IMPORTART: To make the point between meta and recursion
 ; Solution: It must be ignored and not resolved! So I need to filter out lower levels on translation and keep it in when its passed as input
 (defn meta-mutate-sequence
-    "Function that makes a composed function out of a partial sequence and that takes the same sequence as input" 
+    "Function that makes a composed function out of 
+    a partial sequence and that takes the same sequence as input and outputs a mutated version of it" 
     [part-sequence]
     ;(println "Meta Sequence: " part-sequence "\n")
     (let [linear-command-list (meta-t/fs-sequence->instructions 
@@ -134,7 +141,8 @@
         part-sequence)))
 
 (defn recursive-system-mutation 
-    "Function that takes a structure of :gen and :sequence and recursively applies meta-mutate on lower-scope sequences"
+    "Function that takes a structure of :gen and :sequence 
+    and recursively applies meta-mutate-sequence on lower-scope sequences"
     [structure]
     (let [sequence (:sequence structure)
           gen (:gen structure)]
@@ -148,8 +156,10 @@
                             sequence)))}))
 
 ; Similar to graphical translation, but instead of list in it is a nested list "(transform (property (unit 433) 23) 23)" for one scope
-; TODO: Make repetition deterministic
 (defn meta-mutate [structure]
+    "Function that takes the previous generation's structure as input makes 
+    several copies, then applies a recursive meta mutation on all copies and composes them together by fitting
+    them in a higher order structure with a glue and some top-level variations"
     (let [times (repetitions structure)
           old structure]
         (loop [remaining times 

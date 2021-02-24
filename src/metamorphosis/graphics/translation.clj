@@ -10,7 +10,9 @@
 ;from the L-System to a graphical instruction set
 
 
-
+;TODO: Find visual translation made out of composable functions that is fitting for a beginning motif. Ideally 3D:
+;      1. Every generation represents one layer of complexity contained in higher levels
+;      2. One Layer of complexity is made out of an algorithm that contains the algorithms of the lower levels
 ;TODO: Adjust and play with these, for interesting results
 
 (def fs->quil {
@@ -104,7 +106,9 @@
                 '(1.0)
                 '(2.0)])]})
 
-(defn split-scopes [sequence]
+(defn split-scopes 
+    "A function that splits an input sequence into a prefix, the next lower-entry and the rest that comes after it"
+    [sequence]
     (loop [prefix []
            remaining sequence]
         (if (> (count remaining) 0) 
@@ -114,8 +118,9 @@
             {:pre prefix})))
 
 ; FIXME: Probably too expensive! Slow on Gen 4...
-; TODO: Implement glue
-(defn recursive-translation [sequence]
+(defn recursive-translation 
+    "A function that recursively translates entries and moves level down when it encounters lower-level structures"
+    [sequence]
     (let [{prefix :pre
            lower-scope :scope
            remaining :rest} (split-scopes sequence)]
@@ -131,16 +136,11 @@
                         temp)
                     variation))
             prefix-translated))))
-          
-(defn test-translation []
-    (recursive-translation (:sequence example/complex)))
 
-;Not the right use-case for a macro, because of the way I pass the argument, which is not a form and needs to be evaluated to the data structure!
 (defn make-quil
-    "This is a function that transforms the formal system to valid quil instructions"
+    "This is a function that transforms the formal system to a flattened valid quil instructions sequence"
     [theorem]
     (println "Translating formal system to quil instructions...")
-    (println theorem)
     (let [instructions (recursive-translation (:sequence theorem))]
         (cons 'do instructions)))
 

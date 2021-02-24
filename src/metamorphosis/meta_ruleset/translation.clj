@@ -5,6 +5,7 @@
 (def input-signals in/input-signals)
 
 (defn strongest-signal [input]
+    "A function that returns the strongest signal in an input sequence"
     (reduce #(if (> (:intensity %2) (:intensity %1))
                     %2
                     %1)
@@ -12,10 +13,17 @@
         (filter #(contains? % :intensity) 
             input)))
 
-(defn get-entry-position [sequence entry]
-    (first (first (filter #(= (second %) entry) (map-indexed vector sequence)))) )
+(defn get-entry-position 
+    "A function that returns the index of a given entry within a sequence"
+    [sequence entry]
+    (first 
+        (first 
+            (filter #(= (second %) entry) 
+                    (map-indexed vector sequence)))))
 
-(defn translate-input-signal [input unit?]
+(defn translate-input-signal 
+    "A function that translates a single signal from the input to class and index"
+    [input unit?]
      (let [amount (* (:duration input) 10)]
         (conj (conj [] (assoc {:class :amount} :index (Math/round (* amount (:intensity input)))))   
             (assoc {:class (if unit?
@@ -25,7 +33,10 @@
                                     :property))} 
                     :index (get-entry-position input-signals (:signal input))))))
 
-(defn next-possible-entry [vec index]
+;TODO: Make it wrap around?
+(defn next-possible-entry 
+    "A function that returns the next possible index of a sequence"
+    [vec index]
     (loop [current-index index]
         (let [entry (get vec current-index)]
             (if entry
@@ -35,6 +46,7 @@
                     (println (str "Not a vector or vector is empty: " vec)))))))
 
 (defn formal-system->form 
+    "A function that serves as abstraction and can translate an entry from the formal system into a provided instruction set"
     [entry translation-unit amount]
     (let [{class :class
           index :index} entry
@@ -64,6 +76,7 @@
             instructions)))
 
 (defn make-first-two [input]
+    "Function that given an input finds the strongest signal and uses it to make a unit and some property or transform"
     (let [strongest (strongest-signal input)
           length (count input)
           index-of-strongest (get-entry-position input strongest)]
@@ -76,11 +89,13 @@
 ;TODO: Can I refactor this more elegantly?
 
 (defn swap-amount [sequence]
+    "A function that is used to swap a class and its related amount entry"
     (reduce #(conj %1 (first %2) (second %2))
         []
         (map reverse (partition 2 sequence))))
 
 (defn process-input [input] 
+    "A function that takes an abstract input sequence and transforms it into an initital motive for the meta-formal-system"
     (let [input-sequence (into [] (filter #(not (= (:signal %) :break)) input))
           first-two (make-first-two input-sequence)
           rest (filter #(not (contains? (set first-two) %)) input-sequence)]

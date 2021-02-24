@@ -1,6 +1,8 @@
 (ns metamorphosis.event-listener.input.command-line)
 
-(defn count-consecutive-letters [letters]
+(defn count-consecutive-letters 
+    "A function that returns the amount of letters that repeat continously"
+    [letters]
     (let [target (first letters)]
         (loop [n 1 
             remaining (rest letters)]
@@ -10,7 +12,9 @@
                     n)
                 n))))
 
-(defn string->input [string]
+(defn string->input 
+    "A function that takes a command line string argument and converts it to an abstract input sequence"
+    [string]
     (loop [letters string
            sequence [] ]
         (if (> (count letters) 0)

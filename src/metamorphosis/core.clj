@@ -7,9 +7,11 @@
 
 (def resolution [1000 1000])
 (def evolving-interval 120)
-(def max-generations 1)
+(def max-generations 4)
 
-(defn init []
+(defn init 
+  "Function that sets the initial state for the program"
+  []
   (let [state (gsys/setup-sketch)]
     (assoc  state :time {
                     :count 0 
@@ -18,6 +20,8 @@
             :input-sequence [])))
 
 (defn metamorph-loop
+  "The main program loop which functions as wrapper for the three main systems: 
+  Event-listener, Meta-Evolving Formal System and Graphical Translation"
   [state]
     (let [state (-> state
                     u/update-util
@@ -35,7 +39,9 @@
             (assoc state :theorem (msys/evolve-next-generation (:theorem state)))
             state))))
 
-(defn -main [& args]
+(defn -main 
+  "Main function that starts a quil window and assigns to it the initialization function and main loop"
+  [& args]
   (let [setup (if (nil? args) 
                 init
                 #(assoc (init) :mode (first args)))]

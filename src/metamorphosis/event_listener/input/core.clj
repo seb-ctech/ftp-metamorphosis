@@ -25,7 +25,9 @@
 (def a-input "a")
 
 
-(defn basic-keyboard [state]
+(defn basic-keyboard 
+    "A function that takes the input state a composes a sequence of abstract input signals based on keyboard input"
+    [state]
     (let [pressed (get-in state [:key-pressed :key])
           released (get-in state [:key-released :key])
           signal (key/process-key pressed released)
@@ -41,17 +43,13 @@
                :key-pressed (if (= signal :break) nil (:key-pressed state))
                :key-released nil
                )))
-
-(defn build-input 
-    [input-queue timer]
-         (if (clojure.core/realized? timer)
-             input-queue
-             (do 
-                 (Thread/sleep input-interval)
-                 (build-input (conj input-queue a-input) timer))))
  
-(defn record-input []
-    (clojure.core/future (Thread/sleep input-interval) (println "Finished Recording")))
+(defn record-input 
+    "A function that returns a future thread that waits for a timeout to resolve"
+    []
+    (clojure.core/future 
+        (Thread/sleep input-interval) 
+        (println "Finished Recording")))
 
 (defn command-line [string]
     (cl/string->input string))
