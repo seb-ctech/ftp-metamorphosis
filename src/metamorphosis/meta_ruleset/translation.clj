@@ -33,17 +33,14 @@
                                     :property))} 
                     :index (get-entry-position input-signals (:signal input))))))
 
-;TODO: Make it wrap around?
 (defn next-possible-entry 
-    "A function that returns the next possible index of a sequence"
+    "A function that returns the next possible index of a sequence, 
+    by wrapping around the length of the sequence. Also works with negative numbers"
     [vec index]
-    (loop [current-index index]
-        (let [entry (get vec current-index)]
-            (if entry
-                entry
-                (if (>= current-index 0)
-                    (recur (dec current-index))
-                    (println (str "Not a vector or vector is empty: " vec)))))))
+    (let [length (count vec)]
+            (if (and (sequential? vec) (> length 0))
+                (get vec (mod index length))
+                (println (str "Not a vector or vector is empty: " vec)))))
 
 (defn formal-system->form 
     "A function that serves as abstraction and can translate an entry from the formal system into a provided instruction set"
@@ -60,7 +57,6 @@
               (if params
                 (cons (first instruction) params)
                 (first instruction)))))
-
 
 (defn fs-sequence->instructions
     "This is a function that transforms a sequence of the formal system to valid provided instruction-set"

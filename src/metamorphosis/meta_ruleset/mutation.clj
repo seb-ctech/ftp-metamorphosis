@@ -14,7 +14,8 @@
     "A function that returns true of false, wether an entry has a lower-level sequence"
     (and (contains? entry :gen)))
 
-(defn meta-rate 
+;TODO: Determine dominant and less dominant. The more dominant a branch is, the lesser in will have to mutate.
+(defn meta-rate
     "Function that given a sequence calculates the mutation rate 
     of the lower scope based on a ratio between transform and property indeces"
     [sequence]
@@ -25,14 +26,22 @@
     (float (/ (min transforms properties) (max transforms properties)))))
 
 ; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
-; Unit: creates something new, 
-;Transform: Changes the sequence, 
+; TODO: Unit: creates something new (can clone a sequence, just an entry, and cherry pick sequences from different levels) 
+; TODO: Transform: Changes the relationship between the entries in the sequence, 
 ; TODO: Property: applies some overall change to the next units (lower level sequences)
 ; TODO: eliminate parameters. Just use Rate. 
 
 (defmacro ignore-glue [entry form]
     "A macro that can be used to make an if form as wrapper to return :glue unmodified"
     `(if (= (:class ~entry) :glue) ~entry ~form))
+
+(defn apply-property 
+    "A wrapper function that applies a unit function to every unit in a sequence 
+    and applies a sequence function to lower level sequences"
+    [sequence unit-property sequence-property]
+    (map #(cond (has-lower-level? %) (assoc % :sequence (sequence-property (:sequence %)))
+                (= (:class %) :unit) (unit-property %)
+                :else %) sequence))
 
 (def fs->mutation {
     :glue [
@@ -67,7 +76,7 @@
     ]
 
     :transform [
-        ; Swap two entries at target index
+        ; TODO: Swap two commands
         (list 
             (fn [n rate sequence]
                 (let [first-cut (split-at 
@@ -79,34 +88,24 @@
                 (into (vector) (flatten (list before (reverse middle) after)))))
             ['(0) '(1) '(2) '(3) '(4)])
     ]
-
+     ; TODO: Swap two amounts                         
     :property [
         ; Decrement all by 1
         (list 
             (fn [rate sequence]
-                (map #(ignore-glue 
-                        %
-                        (if (has-lower-level? %)
-                            %
-                            (assoc % :index
-                                (let [i (:index %)] 
-                                    (if (> i 0)
-                                        (dec i)
-                                        i)))))
-                     sequence)))
+                (let [unit-f #(assoc % :index
+                                (dec (:index %)))
+                      seq-f #(map (fn [entry] (unit-f entry))
+                                  %)]
+                (apply-property sequence unit-f seq-f))))
         ; Increment all by 1
         (list 
             (fn [rate sequence]
-                (map #(ignore-glue 
-                            % 
-                            (if (has-lower-level? %)
-                                %
-                                (assoc % :index
-                                    (let [i (:index %)]
-                                        (if (< i 5)
-                                            (inc i)
-                                            i)))))
-                     sequence)))
+                    (let [unit-f #(assoc % :index
+                                    (inc (:index %)))
+                          seq-f #(map (fn [entry] (unit-f entry))
+                                      %)]
+                    (apply-property sequence unit-f seq-f))))
     ]
 })
 
@@ -115,7 +114,8 @@
     "Function that uses a deterministic algorithm to determine an amount between 1 and 7 for the next step"
     (inc (rand-int 3)))
 
-;TODO: Make deterministic
+;TODO: Make deterministic: Needs to produce a series between 1 and 3 (property, unit or transform) unit and property however would need to be preceded by a transform.
+
 (defn higher-order-> [theorem]
     "Function that computes a sequence of one to three random classes by some deterministic algorithm"
     (:sequence (f/build-random-axiom 2)))
@@ -180,13 +180,16 @@
 
 ; ======= TEST FUNCTIONS ===============================
 
-(defn test-single-command [class index]
+(defn test-single-command 
+    ([class index]
+        (test-single-command class index (:sequence example/simple)))
+    ([class index sequence]
     (let [command (get (class fs->mutation) index)]
-        (println (str "Before: " (:sequence example/simple)))
+        (println (str "Before: " sequence))
         (apply (first command) 
                (if (> (count command) 1) 
-                   (list 2 0.2 (:sequence example/simple))  
-                   (list 0.2 (:sequence example/simple))))))
+                   (list 2 0.2 sequence)  
+                   (list 0.2 sequence))))))
 
 (defn test-recursive-translation []
     (recursive-system-mutation example/nested))
