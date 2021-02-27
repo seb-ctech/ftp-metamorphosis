@@ -23,7 +23,6 @@
 
 (defn gen-variation [top current variation]
     (str 
-        (nested-prefix (dec top) current)
         (if (= (:type variation) :original)
             "O | Original"
             (str "X | Mutation-" (:index variation)))
@@ -35,8 +34,7 @@
                     (apply str 
                         (repeat (dec (:rep variation)) "x")))
                 ""))
-        ")" "\n" 
-        (nested-prefix top current) short-separator "\n"))
+        ")" "\n" ))
 
 (defn command->string [amount command]
     (str (case (:class command)
@@ -76,21 +74,25 @@
         (let [next (first remaining)]
             (if (> (count remaining) 0)
                 (if (contains? next :sequence)
-                    (recur [] 
-                        (rest remaining)  
-                        (inc index) 
-                        (str final-string
-                            (if (= index 0)
-                                (gen-variation top (:gen next) {:type :original :rep (get-repetitions (:sequence next))})
-                                (gen-variation top (:gen next) {:type :variation :index index}))
-                            (nested-prefix top (:gen next))
-                            (sequence->string prefix)
-                            (if (> (count prefix) 0) 
-                                next-entry
-                                "")
-                            (if (= (:gen next) 0)
-                                (str "[" (sequence->string (:sequence next)) "]" "\n" "\n")
-                                (recursive-sequence top (:gen next) (:sequence next)))))
+                    (let [next-index (:gen next)
+                          prefix (filter #(not (= (:class %) :glue)) prefix)]
+                        (recur 
+                            [] 
+                            (rest remaining)  
+                            (inc index) 
+                            (str final-string
+                                (if (= index 0)
+                                    (gen-variation top next-index {:type :original :rep (get-repetitions (:sequence next))})
+                                    (str (nested-prefix top current) (gen-variation top next-index {:type :variation :index index})))
+                                (nested-prefix top current)
+                                (if (or (empty? prefix) (empty? (first prefix)))
+                                    "" 
+                                    (str (sequence->string prefix) next-entry))
+                                (if (= (:gen next) 0)
+                                    (str "[" (sequence->string (:sequence next)) "]" )
+                                    (recursive-sequence top next-index (:sequence next)))
+                                "\n"
+                                (nested-prefix top current) short-separator "\n")))
                     (recur (conj prefix next)
                            (rest remaining)
                            index
