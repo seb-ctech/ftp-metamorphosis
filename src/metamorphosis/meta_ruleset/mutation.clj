@@ -1,6 +1,6 @@
 (ns metamorphosis.meta-ruleset.mutation
-    (:require [metamorphosis.meta-ruleset.formal-system :as f]
-              [metamorphosis.meta-ruleset.formal-system-example-structure :as example]
+    (:require [metamorphosis.meta-ruleset.formal-system.core :as f]
+              [metamorphosis.meta-ruleset.formal-system.examples :as example]
               [metamorphosis.meta-ruleset.translation :as meta-t]))
 
 (defn glue 
@@ -28,7 +28,7 @@
 ; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
 ; TODO: Unit: creates something new (can clone a sequence, just an entry, and cherry pick sequences from different levels) 
 ; TODO: Transform: Changes the relationship between the entries in the sequence, 
-; TODO: Property: applies some overall change to the next units (lower level sequences)
+; Property: applies some overall change to the next units (lower level sequences)
 ; TODO: eliminate parameters. Just use Rate. 
 
 (defmacro ignore-glue [entry form]
@@ -109,10 +109,10 @@
     ]
 })
 
-;TODO: Implement
 (defn repetitions [structure]
     "Function that uses a deterministic algorithm to determine an amount between 1 and 7 for the next step"
-    (inc (rand-int 3)))
+    (let [units-count (count (:sequence structure))]
+        (inc (mod 6 (- units-count (:gen structure))))))
 
 ;TODO: Make deterministic: Needs to produce a series between 1 and 3 (property, unit or transform) unit and property however would need to be preceded by a transform.
 
@@ -126,7 +126,6 @@
     "Function that makes a composed function out of 
     a partial sequence and that takes the same sequence as input and outputs a mutated version of it" 
     [part-sequence]
-    ;(println "Meta Sequence: " part-sequence "\n")
     (let [linear-command-list (meta-t/fs-sequence->instructions 
                                     (filter #(not (has-lower-level? %)) 
                                             part-sequence) 

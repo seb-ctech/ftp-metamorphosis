@@ -1,5 +1,5 @@
 (ns metamorphosis.event-listener.input.core
-    (:require [metamorphosis.meta-ruleset.formal-system :as f]
+    (:require [metamorphosis.meta-ruleset.formal-system.core :as f]
               [metamorphosis.event-listener.input.command-line :as cl]
               [metamorphosis.event-listener.input.keyboard :as key]))
 

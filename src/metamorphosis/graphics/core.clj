@@ -1,6 +1,7 @@
 (ns metamorphosis.graphics.core
     (:require [quil.core :as q]
               [quil.middleware :as m]
+              [metamorphosis.meta-ruleset.formal-system.core :as fs]
               [metamorphosis.graphics.translation :as t]
               [metamorphosis.event-listener.input.keyboard :as key])
     (:gen-class))
@@ -46,12 +47,10 @@
             (if 
                 (not= (:last-gen state) (get-in state [:theorem :gen]))
                 (let [new (t/make-quil (:theorem state))]
-                    (println "Generation: " (get-in state [:theorem :gen]))
-                    (println (get-in state [:theorem :sequence]))
+                    (fs/print-theorem (:theorem state))
                     new)
                 (:g-instructions state))
-            (do (println "Generation: " (get-in state [:theorem :gen]))
-                (println (get-in state [:theorem :sequence]))
+            (do 
                 (t/make-quil (:theorem state))))]
     (assoc (assoc state :g-instructions instructions)
             :last-gen (get-in state [:theorem :gen]))))

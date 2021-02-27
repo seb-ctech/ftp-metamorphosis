@@ -1,4 +1,6 @@
-(ns metamorphosis.meta-ruleset.formal-system)
+(ns metamorphosis.meta-ruleset.formal-system.core
+    (:require 
+        [metamorphosis.meta-ruleset.formal-system.print :as p]))
 
 ;=== PROTOTYPE OF AN ABSTRACT DATA STRUCTURE ===
 
@@ -47,5 +49,14 @@
                             (random-entry)))
                  (build-axiom sequence)))))
 
-
-
+(defn print-theorem [theorem]
+    (let [top-level (if (= (:gen theorem) 0)
+                        (p/top-level-generation (:gen theorem))
+                        (p/top-level-generation (:gen theorem) (p/get-repetitions (:sequence theorem))))]
+        (println (str "\n" top-level "\n"
+                    (if (= (:gen theorem) 0)
+                        (p/sequence->string (:sequence theorem))
+                        (p/recursive-sequence (:gen theorem) 
+                                            (dec (:gen theorem)) 
+                                            (:sequence theorem)))
+                        "\n"))))

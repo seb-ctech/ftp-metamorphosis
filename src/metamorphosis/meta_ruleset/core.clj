@@ -1,6 +1,6 @@
 (ns metamorphosis.meta-ruleset.core
     (:require 
-        [metamorphosis.meta-ruleset.formal-system :as f]
+        [metamorphosis.meta-ruleset.formal-system.core :as f]
         [metamorphosis.meta-ruleset.mutation :as m]
         [metamorphosis.meta-ruleset.translation :as tr])
     (:gen-class)) 

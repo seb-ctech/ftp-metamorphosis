@@ -4,7 +4,7 @@
         [metamorphosis.graphics.glsl-parsing :as glsl]
         [metamorphosis.meta-ruleset.translation :as meta-t]
         ;TODO: Remove after testing
-        [metamorphosis.meta-ruleset.formal-system-example-structure :as example]))
+        [metamorphosis.meta-ruleset.formal-system.examples :as example]))
 
 ;This module contains translation functions that convert the abstract theorem structure 
 ;from the L-System to a graphical instruction set

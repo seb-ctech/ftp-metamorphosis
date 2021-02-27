@@ -1,4 +1,4 @@
-(ns metamorphosis.meta-ruleset.formal-system-example-structure)
+(ns metamorphosis.meta-ruleset.formal-system.examples)
 ;Starting Motif
 (def simple
     {:gen 0, :sequence [

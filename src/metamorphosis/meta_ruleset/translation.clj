@@ -43,7 +43,8 @@
                 (println (str "Not a vector or vector is empty: " vec)))))
 
 (defn formal-system->form 
-    "A function that serves as abstraction and can translate an entry from the formal system into a provided instruction set"
+    "A function that serves as abstraction and can translate an entry 
+    from the formal system into a provided instruction set"
     [entry translation-unit amount]
     (let [{class :class
           index :index} entry
@@ -59,7 +60,7 @@
                 (first instruction)))))
 
 (defn fs-sequence->instructions
-    "This is a function that transforms a sequence of the formal system to valid provided instruction-set"
+    "A function that transforms a sequence of the formal system to valid provided instruction-set"
     [sequence instruction-set]
     (loop [remaining sequence
             amount {:class :amount :index 0}
@@ -72,7 +73,7 @@
             instructions)))
 
 (defn make-first-two [input]
-    "Function that given an input finds the strongest signal and uses it to make a unit and some property or transform"
+    "A function that given an input finds the strongest signal and uses it to make a unit and some property or transform"
     (let [strongest (strongest-signal input)
           length (count input)
           index-of-strongest (get-entry-position input strongest)]
@@ -91,7 +92,7 @@
         (map reverse (partition 2 sequence))))
 
 (defn process-input [input] 
-    "A function that takes an abstract input sequence and transforms it into an initital motive for the meta-formal-system"
+    "A function that takes an abstract input sequence and transforms it into an initital motif for the meta-formal-system"
     (let [input-sequence (into [] (filter #(not (= (:signal %) :break)) input))
           first-two (make-first-two input-sequence)
           rest (filter #(not (contains? (set first-two) %)) input-sequence)]
