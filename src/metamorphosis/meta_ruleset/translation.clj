@@ -63,8 +63,8 @@
                 {:class (if unit?
                             :unit 
                             (if (odd? index) 
-                                :transform
-                                :property))
+                                :property
+                                :transform))
                 :index (get-entry-position input-signals (:signal input))})))
 
 (defn process-input [input] 
