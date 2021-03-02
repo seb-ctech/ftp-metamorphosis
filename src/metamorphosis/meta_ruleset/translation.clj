@@ -4,15 +4,6 @@
 (def test-input in/test-input)
 (def input-signals in/input-signals)
 
-(defn strongest-signal [input]
-    "A function that returns the strongest signal in an input sequence"
-    (reduce #(if (> (:intensity %2) (:intensity %1))
-                    %2
-                    %1)
-        {:intensity 0}
-        (filter #(contains? % :intensity) 
-            input)))
-
 (defn get-entry-position 
     "A function that returns the index of a given entry within a sequence"
     [sequence entry]
@@ -20,18 +11,6 @@
         (first 
             (filter #(= (second %) entry) 
                     (map-indexed vector sequence)))))
-
-(defn translate-input-signal 
-    "A function that translates a single signal from the input to class and index"
-    [input group]
-     (let [amount (* (float (:duration input)) 10)]
-        (conj (conj [] (assoc {:class :amount} :index amount)))   
-            (assoc {:class (if unit?
-                                :unit 
-                                (if (> (:intensity input) 0.5) 
-                                    :transform
-                                    :property))} 
-                    :index (get-entry-position input-signals (:signal input)))))
 
 (defn next-possible-entry 
     "A function that returns the next possible index of a sequence, 
@@ -72,36 +51,42 @@
                     (recur (rest remaining) amount (conj instructions (formal-system->form next instruction-set amount)))))
             instructions)))
 
-(defn make-first-two [input]
-    "A function that given an input finds the strongest signal and uses it to make a unit and some property or transform"
-    (let [strongest (strongest-signal input)
-          length (count input)
-          index-of-strongest (get-entry-position input strongest)]
-        (conj (if (> index-of-strongest 0) 
-                    (vector (get input (dec index-of-strongest)))
-                    []) strongest)))
-                
-;TODO: Find a better translation algorithm, that is not limited to 'every 3' pattern
-;TODO: How do you account for breaks? For now I keep it out
-;TODO: Can I refactor this more elegantly?
+(defn evaluate-break [signal]
+    (or (not= (:signal signal) :break)(> (float (:duration signal)) 0.001)))
 
-(defn swap-amount [sequence]
-    "A function that is used to swap a class and its related amount entry"
-    (reduce #(conj %1 (first %2) (second %2))
-        []
-        (map reverse (partition 2 sequence))))
+(defn translate-input-signal 
+    "A function that translates a single signal from the input to class and index"
+    [input index unit?]
+        (let [amount (int (* (float (:duration input)) 10 3))]
+            (conj
+                (vector {:class :amount :index amount})
+                {:class (if unit?
+                            :unit 
+                            (if (odd? index) 
+                                :transform
+                                :property))
+                :index (get-entry-position input-signals (:signal input))})))
 
 (defn process-input [input] 
-    "A function that takes an abstract input sequence and transforms it into an initital motif for the meta-formal-system"
-    (let [input-sequence (into [] (filter #(not (= (:signal %) :break)) input))
-          first-two (make-first-two input-sequence)
-          rest (filter #(not (contains? (set first-two) %)) input-sequence)]
-        (into (into [] (if (> (count first-two) 1)
-                        (into (translate-input-signal (first first-two) false) 
-                                (translate-input-signal (second first-two) true))
-                        (translate-input-signal (first first-two) true)))
-            (swap-amount (reverse (reduce #(into %1 
-                                    (translate-input-signal (second %2) 
-                                        (= (mod (first %2) 3) 0)))
-                            []
-                            (map-indexed vector (reverse rest))))))))
+    "A function that takes an abstract input sequence 
+    and transforms it into an initital motif for the meta-formal-system"
+    (let [input-seq (filter evaluate-break input)]
+        (loop [group []
+               remaining input-seq
+               final-sequence []]
+            (let [next (first remaining)]
+                (if (> (count remaining) 0)
+                    (if (or (= (:signal next) :break) (= (count (rest remaining)) 0))
+                        (recur [] 
+                                (rest remaining) 
+                                (into final-sequence 
+                                    (flatten (map-indexed (fn [index, entry] 
+                                                    (translate-input-signal 
+                                                        entry 
+                                                        index 
+                                                        (= (dec (count group)) index)))
+                                                group))))
+                        (recur (conj group next) 
+                               (rest remaining) 
+                                final-sequence))
+                    final-sequence)))))

@@ -15,8 +15,6 @@
     
 (defn first-generation [input-sequence]
     (println "Sequence: " input-sequence)
-    (println "Motif: " )
-    (doseq [entry (tr/process-input input-sequence)] (println entry))
     (f/build-axiom (tr/process-input input-sequence)))
 
 ;==== TEST FUNCTIONS ======
