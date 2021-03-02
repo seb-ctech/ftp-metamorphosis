@@ -115,8 +115,9 @@
 
 (defn higher-order-> [mutation index]
     "Function that computes a sequence of one to three random classes by some deterministic algorithm"
+    (let [units (filter )])
     [{:class :amount :index (inc (rand-int 3))}
-     {:class :transform :index 5}])
+     {:class :transform :index (rand-int 6)}])
  
 (defn count-sub-sequence-copies [sequence]
     (count (filter has-lower-level? sequence)))

@@ -49,6 +49,9 @@
                             (random-entry)))
                  (build-axiom sequence)))))
 
+(defn class? [class entry]
+    (= (:class entry) class))
+
 (defn print-theorem [theorem]
     (let [top-level (if (= (:gen theorem) 0)
                         (p/top-level-generation (:gen theorem))

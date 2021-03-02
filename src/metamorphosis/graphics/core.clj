@@ -28,7 +28,6 @@
 (defn render-generation 
     "Function that evaluates the instruction set to render the current generation"
     [instructions]
-    ;(println instructions)
     (q/translate (/ (q/width) 2) (/ (q/height) 2))
     (eval instructions))
 
