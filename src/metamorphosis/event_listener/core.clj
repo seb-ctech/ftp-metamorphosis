@@ -35,7 +35,6 @@
 (defn get-event 
     "A function that returns true, when a new input was produced and the new input"
     [state]
-    ;(println (:input-sequence state))
     {:new-input? (:done? state) 
      :input (:input-sequence state)})
 

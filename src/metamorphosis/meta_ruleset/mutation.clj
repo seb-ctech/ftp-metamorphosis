@@ -12,7 +12,7 @@
 
 (defn has-lower-level? [entry]
     "A function that returns true of false, wether an entry has a lower-level sequence"
-    (and (contains? entry :gen)))
+    (and (contains? entry :sequence)))
 
 ;TODO: Determine dominant and less dominant. The more dominant a branch is, the lesser in will have to mutate.
 (defn meta-rate
@@ -112,7 +112,7 @@
 (defn repetitions [structure]
     "Function that uses a deterministic algorithm to determine an amount between 1 and 7 for the next step"
     (let [units-count (count (:sequence structure))]
-        (inc (mod 6 (- units-count (:gen structure))))))
+        (inc (mod (- units-count (:gen structure)) 6))))
 
 ;TODO: Make deterministic: Needs to produce a series between 1 and 3 (property, unit or transform) unit and property however would need to be preceded by a transform.
 

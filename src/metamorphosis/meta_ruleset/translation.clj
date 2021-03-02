@@ -23,15 +23,15 @@
 
 (defn translate-input-signal 
     "A function that translates a single signal from the input to class and index"
-    [input unit?]
-     (let [amount (* (:duration input) 10)]
-        (conj (conj [] (assoc {:class :amount} :index (Math/round (* amount (:intensity input)))))   
+    [input group]
+     (let [amount (* (float (:duration input)) 10)]
+        (conj (conj [] (assoc {:class :amount} :index amount)))   
             (assoc {:class (if unit?
                                 :unit 
                                 (if (> (:intensity input) 0.5) 
                                     :transform
                                     :property))} 
-                    :index (get-entry-position input-signals (:signal input))))))
+                    :index (get-entry-position input-signals (:signal input)))))
 
 (defn next-possible-entry 
     "A function that returns the next possible index of a sequence, 
