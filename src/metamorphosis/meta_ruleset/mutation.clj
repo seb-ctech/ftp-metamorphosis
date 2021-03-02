@@ -18,12 +18,8 @@
 (defn meta-rate
     "Function that given a sequence calculates the mutation rate 
     of the lower scope based on a ratio between transform and property indeces"
-    [sequence]
-    (let [transforms (inc (apply + (map #(:index %) 
-                                        (filter #(= (:class %) :transform) sequence))))
-          properties (inc (apply + (map #(:index %) 
-                                        (filter #(= (:class %) :property) sequence))))]
-    (float (/ (min transforms properties) (max transforms properties)))))
+    [max copies remaining]
+    (* max (/ (- copies (dec remaining)) copies)))
 
 ; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
 ; TODO: Unit: creates something new (can clone a sequence, just an entry, and cherry pick sequences from different levels) 
@@ -114,18 +110,23 @@
     (let [units-count (count (:sequence structure))]
         (inc (mod (- units-count (:gen structure)) 6))))
 
-;TODO: Make deterministic: Needs to produce a series between 1 and 3 (property, unit or transform) unit and property however would need to be preceded by a transform.
+;TODO: Make deterministic:
+; Needs to always contain a transform and generate progressive sequences like TRANS->TRANS->LOWER-LEVEL
 
-(defn higher-order-> [theorem]
+(defn higher-order-> [mutation index]
     "Function that computes a sequence of one to three random classes by some deterministic algorithm"
-    (:sequence (f/build-random-axiom 2)))
+    [{:class :amount :index (inc (rand-int 3))}
+     {:class :transform :index 5}])
  
+(defn count-sub-sequence-copies [sequence]
+    (count (filter has-lower-level? sequence)))
+
 ; How do you avoid recursion in here? IMPORTART: To make the point between meta and recursion
 ; Solution: It must be ignored and not resolved! So I need to filter out lower levels on translation and keep it in when its passed as input
 (defn meta-mutate-sequence
     "Function that makes a composed function out of 
     a partial sequence and that takes the same sequence as input and outputs a mutated version of it" 
-    [part-sequence]
+    [part-sequence rate]
     (let [linear-command-list (meta-t/fs-sequence->instructions 
                                     (filter #(not (has-lower-level? %)) 
                                             part-sequence) 
@@ -135,45 +136,51 @@
             (map 
                 #(partial (if (seq? %) 
                               (apply partial %) 
-                              %) (meta-rate part-sequence))
+                              %) rate)
                 linear-command-list))
         part-sequence)))
 
 (defn recursive-system-mutation 
     "Function that takes a structure of :gen and :sequence 
     and recursively applies meta-mutate-sequence on lower-scope sequences"
-    [structure]
+    [structure rate]
     (let [sequence (:sequence structure)
-          gen (:gen structure)]
-    {:gen gen 
-     :sequence (into 
-                    (vector) 
-                    (meta-mutate-sequence 
-                        (map #(if (has-lower-level? %)
-                                  (recursive-system-mutation %)
-                                  %)
-                            sequence)))}))
+          gen (:gen structure)
+          copies (count-sub-sequence-copies sequence)]
+    (loop [new-sequence []
+           remaining sequence
+           index 0]
+        (if (> (count remaining) 0)
+            (let [next (first remaining)]
+                (recur (conj new-sequence
+                            (if (has-lower-level? next)
+                                (recursive-system-mutation next (if (> copies 0)
+                                                                    (meta-rate rate copies (- copies index))
+                                                                    rate))
+                                next))
+                       (rest remaining)
+                       (if (has-lower-level? next)
+                           (inc index)
+                           index)))
+            {:gen gen :sequence new-sequence}))))
 
 ; Similar to graphical translation, but instead of list in it is a nested list "(transform (property (unit 433) 23) 23)" for one scope
 (defn meta-mutate [structure]
     "Function that takes the previous generation's structure as input makes 
     several copies, then applies a recursive meta mutation on all copies and composes them together by fitting
-    them in a higher order structure with a glue and some top-level variations"
+    them in a higher order structure with a glue and a higher-order prefix-sequence"
     (let [times (repetitions structure)
-          old structure]
+          original structure]
         (loop [remaining times 
-               composition (conj 
-                                [(glue times)]
-                                old)]
+               composition (conj (vector (glue times)) original)]
             (if (> remaining 0)
                 (recur 
                     (dec remaining)
-                    (conj 
-                        (reduce 
-                            conj 
-                            composition 
-                            (into (vector) (cons (glue times remaining) (higher-order-> structure)))) 
-                        (recursive-system-mutation structure)))
+                    (let [variation (recursive-system-mutation structure (meta-rate 1.0 times remaining))]
+                        (conj 
+                            (into composition 
+                                (into (vector (glue times remaining)) (higher-order-> variation remaining))) 
+                            variation)))
                 composition))))
 
 
