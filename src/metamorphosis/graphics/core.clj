@@ -29,6 +29,7 @@
     "Function that evaluates the instruction set to render the current generation"
     [instructions]
     (q/translate (/ (q/width) 2) (/ (q/height) 2))
+    (q/no-stroke)(q/fill 0 0 41)
     (eval instructions))
 
 (defn setup-sketch 
