@@ -49,8 +49,17 @@
                             (random-entry)))
                  (build-axiom sequence)))))
 
-(defn class? [class entry]
+(defn command-class? [class entry]
     (= (:class entry) class))
+
+(defn build-command-pair [class index amount]
+    (list {:class :amount :index amount}
+          {:class class :index index}))
+
+(defn read-command-pair [pair]
+    {:class (:class (second pair))
+     :index (:index (second pair))
+     :amount (:index (first pair))})
 
 (defn print-theorem [theorem]
     (let [top-level (if (= (:gen theorem) 0)

@@ -21,7 +21,7 @@
 
 ; ==============================================
 
-(def input-interval 3000)
+(def input-interval 4000)
 (def a-input "a")
 
 

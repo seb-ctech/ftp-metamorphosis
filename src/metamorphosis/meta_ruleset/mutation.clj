@@ -12,9 +12,8 @@
 
 (defn has-lower-level? [entry]
     "A function that returns true of false, wether an entry has a lower-level sequence"
-    (and (contains? entry :sequence)))
+    (contains? entry :sequence))
 
-;TODO: Determine dominant and less dominant. The more dominant a branch is, the lesser in will have to mutate.
 (defn meta-rate
     "Function that given a sequence calculates the mutation rate 
     of the lower scope based on a ratio between transform and property indeces"
@@ -110,14 +109,48 @@
     (let [units-count (count (:sequence structure))]
         (inc (mod (- units-count (:gen structure)) 6))))
 
-;TODO: Make deterministic:
-; Needs to always contain a transform and generate progressive sequences like TRANS->TRANS->LOWER-LEVEL
-
 (defn higher-order-> [mutation index]
-    "Function that computes a sequence of one to three random classes by some deterministic algorithm"
-    (let [units (filter )])
-    [{:class :amount :index (inc (rand-int 3))}
-     {:class :transform :index (rand-int 6)}])
+    "Function that computes a sequence of one to three command classes by some deterministic algorithm"
+    (let [gen (:gen mutation)
+          units (filter #(f/command-class? :unit %) (:sequence mutation))
+          trans (filter #(f/command-class? :transform %) (:sequence mutation))
+          props (filter #(f/command-class? :property %) (:sequence mutation))
+          amounts (filter #(f/command-class? :amount %) (:sequence mutation))
+          commands (map f/read-command-pair (partition 2 (:sequence mutation)))
+          initial-sequence (into (vector) 
+                                (f/build-command-pair
+                                    :transform 
+                                    (:index (first units))
+                                    (int (+ (/ (apply + (map #(:index %) amounts)) (inc (count amounts))) 2 (int (/ index 2)) gen))))
+          add-trans (if (< (count trans) 3) 
+                        (into initial-sequence 
+                            (f/build-command-pair
+                                :transform
+                                (- 8 (- (:index (last trans)) (:index (first trans))))
+                                (int (- (* (/ (apply + (map #(:amount %) commands)) (inc (count commands))) 2) 5 (int (/ index 2))))))
+                        initial-sequence)
+          add-prop (if (< (count props) 3)
+                       (into add-trans 
+                            (f/build-command-pair
+                                :property
+                                (get (filter #(not (or (map (fn [b] (= % b)) (map (fn [e] (:index e)) props))))) 
+                                        (reduce max 0 (map #(:index %) props)))
+                                (int (+ (/ (apply + (map #(:index %) props)) (inc (count props))) 2))))
+                        add-trans)
+          add-unit (if (< (count units) 3)
+                       (into add-prop 
+                            (f/build-command-pair
+                                :unit
+                                (reduce min 100 (map #(:index %) units))
+                                (int (+ (/ (apply + (map #(:index %) units)) (inc (count units))) 2)))))]
+            (if  (f/command-class? :unit (last add-unit))
+                 (into add-unit 
+                    (f/build-command-pair
+                        :transform
+                        (inc (:index (last trans)))
+                        (int (+ (/ (apply + (map #(:amount %) commands)) (inc (count commands))) 3))))
+                 add-unit)))
+        
  
 (defn count-sub-sequence-copies [sequence]
     (count (filter has-lower-level? sequence)))
@@ -148,6 +181,7 @@
     (let [sequence (:sequence structure)
           gen (:gen structure)
           copies (count-sub-sequence-copies sequence)]
+        (println "Gen: " gen "Rate: " rate)
     (loop [new-sequence []
            remaining sequence
            index 0]
@@ -165,7 +199,6 @@
                            index)))
             {:gen gen :sequence new-sequence}))))
 
-; Similar to graphical translation, but instead of list in it is a nested list "(transform (property (unit 433) 23) 23)" for one scope
 (defn meta-mutate [structure]
     "Function that takes the previous generation's structure as input makes 
     several copies, then applies a recursive meta mutation on all copies and composes them together by fitting
