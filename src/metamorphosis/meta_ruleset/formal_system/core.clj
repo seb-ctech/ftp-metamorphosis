@@ -20,6 +20,10 @@
                  (rand-int (count alphabet)))
      :index (rand-int 5)})
 
+(defn build-axiom [sequence]
+    "Function that builds an axiom out of a sequence by appending gen 0"
+    {:gen 0 :sequence sequence})
+
 (defn glue 
     "A function that returns an addition helper class that behaves as a fix and is aware of all copies"
     ([n]
@@ -45,10 +49,6 @@
                 (recur (conj sequence 
                             (random-entry)))
                  (build-axiom sequence)))))
-
-(defn build-axiom [sequence]
-    "Function that builds an axiom out of a sequence by appending gen 0"
-    {:gen 0 :sequence sequence})
 
 (defn command-class? [class entry]
     (= (:class entry) class))

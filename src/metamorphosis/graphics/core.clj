@@ -29,7 +29,6 @@
     "Function that evaluates the instruction set to render the current generation"
     [instructions]
     (q/translate (/ (q/width) 2) (/ (q/height) 2))
-    (q/no-stroke)(q/fill 0 0 41)
     (eval instructions))
 
 (defn setup-sketch 
@@ -61,6 +60,8 @@
     "Main function that renders a frame"
     [state]
     (q/background 0)
+    (q/no-stroke)
+    (q/fill 18 23 23)
     (if (= (:mode state) :glsl)
         (render-shader (:shader state))
         (when (contains? state :theorem)
