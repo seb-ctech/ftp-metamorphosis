@@ -102,46 +102,59 @@
 (defn higher-order-> [mutation index]
     "Function that computes a sequence of one to three command classes by some deterministic algorithm"
     (let [gen (:gen mutation)
-          preprocessed (filter #(not (f/command-class? :glue %)) (:sequence mutation))
-          units (filter #(f/command-class? :unit %) preprocessed)
-          trans (filter #(f/command-class? :transform %) preprocessed)
-          props (filter #(f/command-class? :property %) preprocessed)
-          amounts (filter #(f/command-class? :amount %) preprocessed)
-          commands (map f/read-command-pair (partition 2 (filter #(not (f/has-lower-level? %)) preprocessed)))
+          transformable (f/transform-> (:sequence mutation))
+          units (filter #(f/command-class? :unit %) transformable)
+          trans (filter #(f/command-class? :transform %) transformable)
+          props (filter #(f/command-class? :property %) transformable)
+          amounts (filter #(f/command-class? :amount %) transformable)
+          commands (map f/read-command-pair (filter #(and (map? %) (not (f/has-lower-level? %))) 
+                                                     (f/group-sequence transformable)))
+          average-value (fn [class-list value] 
+                            (let [count (count class-list)]
+                                (if (> count 0)
+                                    (int (/ (apply + (map value class-list)) count))
+                                    0)))
           initial-sequence (into (vector) 
                                 (f/build-command-pair
                                     :transform 
-                                    (:index (first units))
-                                    (int (+ (/ (apply + (map #(:index %) amounts)) (inc (count amounts))) 2 (int (/ index 2)) gen))))
+                                    (if (> (count units) 0)
+                                        (:index (first units))
+                                        (- (* index 2) 3))
+                                    (int (+ (average-value amounts :index) 2 (int (/ index 2)) gen))))
                                 test (do (println "Initial sequence: " initial-sequence))
-          add-trans (if (and (< (count trans) 3) (> (count trans) 0))
+          add-trans (if (< (count trans) 3)
                         (into initial-sequence 
                             (f/build-command-pair
                                 :transform
-                                (- 8 (- (:index (last trans)) (:index (first trans))))
-                                (int (- (* (/ (apply + (map #(:amount %) commands)) (inc (count commands))) 2) 5 (int (/ index 2))))))
+                                (if (> (count trans) 0)
+                                    (- 8 (- (:index (last trans)) (:index (first trans))))
+                                    (int (/ (+ index 4) (inc (- 3 index )))))
+                                (int (- (* (average-value commands :amount) 2) 5 (int (/ index 2))))))
                         initial-sequence)
-          add-prop (if (and (< (count props) 3) (> (count props) 0))
+          add-prop (if (< (count props) 3)
                        (into add-trans 
                             (f/build-command-pair
                                 :property
-                                (get (filter #(not (or (map (fn [b] (= % b)) (map (fn [e] (:index e)) props)))) (range 10)) 
-                                     (reduce max 0 (map #(:index %) props)))
-                                (int (+ (/ (apply + (map #(:index %) props)) (inc (count props))) 2))))
+                                (reduce max 0 (filter #(not (map (fn [b] (= % b)) (map :index props))) (range 8)))
+                                (int (+ (average-value props :index) 2))))
                         add-trans)
-          add-unit (if (and (< (count units) 3) (> (count units) 0))
+          add-unit (if (< (count units) 3)
                        (into add-prop 
                             (f/build-command-pair
                                 :unit
-                                (reduce min 100 (map #(:index %) units))
-                                (int (+ (/ (apply + (map #(:index %) units)) (inc (count units))) 2))))
+                                (if (> (count units) 0)
+                                    (reduce min 100 (map :index units))
+                                    (- 5 index))
+                                (int (+ (average-value units :index) 2))))
                         add-prop)]
             (if  (f/command-class? :unit (last add-unit))
                  (into add-unit 
                     (f/build-command-pair
                         :transform
-                        (inc (:index (last trans)))
-                        (int (+ (/ (apply + (map #(:amount %) commands)) (inc (count commands))) 3))))
+                        (if (> (count trans) 0) 
+                            (inc (:index (last trans)))
+                            (- index 2))
+                        (+ (average-value commands :amount) 3)))
                  add-unit)))
         
  

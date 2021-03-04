@@ -30,7 +30,8 @@
           amount (:index amount)
           instruction (if (= class :glue) 
                           (first (translation-unit class))
-                          (next-possible-entry (translation-unit class) index))
+                          (do (when (nil? index)(println "Nil: " entry))
+                          (next-possible-entry (translation-unit class) index)))
           params (when (second instruction) (next-possible-entry (second instruction) amount))]
           (if (= class :glue)
               (cons (first instruction) (:values entry))
