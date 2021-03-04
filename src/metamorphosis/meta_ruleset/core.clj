@@ -6,7 +6,7 @@
     (:gen-class)) 
 
 (defn next-step [structure]
-    (println "Next generation")
+    (println "Next generation " (inc (:gen structure)) " -->")
         {:gen (inc (:gen structure)) 
             :sequence (m/meta-mutate structure)})
 

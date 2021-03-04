@@ -148,5 +148,4 @@
                                               (:gen theorem) 
                                               (:sequence theorem)))
                         "\n")]
-        (do (spit "resources/theorem.log" output)
-            (println output))))
+        (do (spit "resources/theorem.log" output))))

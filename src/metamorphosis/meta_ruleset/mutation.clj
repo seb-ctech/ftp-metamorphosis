@@ -121,7 +121,6 @@
                                         (:index (first units))
                                         (- (* index 2) 3))
                                     (int (+ (average-value amounts :index) 2 (int (/ index 2)) gen))))
-                                test (do (println "Initial sequence: " initial-sequence))
           add-trans (if (< (count trans) 3)
                         (into initial-sequence 
                             (f/build-command-pair
@@ -161,7 +160,10 @@
                  add-unit)))
         
  
-
+(defn fuse-mutation 
+    "A function that fuses an original sequence with a mutated one by a mutation rate"
+    [original mutated rate]
+    mutated)
 
 ; How do you avoid recursion in here? IMPORTART: To make the point between meta and recursion
 ; Solution: It must be ignored and not resolved! So I need to filter out lower levels on translation and keep it in when its passed as input
@@ -171,16 +173,15 @@
     [part-sequence rate]
     (let [linear-command-list (meta-t/fs-sequence->instructions 
                                     (filter #(not (f/has-lower-level? %)) 
-                                            part-sequence) 
+                                        part-sequence) 
                                     fs->mutation)]
-        ((apply 
-            comp 
-            (map 
-                #(partial (if (seq? %) 
-                              (apply partial %) 
-                              %) rate)
-                linear-command-list))
-        part-sequence)))
+        (fuse-mutation part-sequence 
+            ((apply comp 
+                    (map #(if (seq? %) 
+                            (apply partial %) 
+                            %) 
+                        linear-command-list))
+                part-sequence) rate)))
 
 (defn recursive-system-mutation 
     "Function that takes a structure of :gen and :sequence 
