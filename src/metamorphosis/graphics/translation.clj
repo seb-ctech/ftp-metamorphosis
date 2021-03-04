@@ -133,33 +133,22 @@
                 '(4.0)
                 '(10.0)])]})
 
-(defn split-scopes 
-    "A function that splits an input sequence into a prefix, the next lower-entry and the rest that comes after it"
-    [sequence]
-    (loop [prefix []
-           remaining sequence]
-        (if (> (count remaining) 0) 
-           (if (contains? (first remaining) :gen)
-                {:pre prefix :scope (first remaining) :rest (rest remaining)}
-                (recur (conj prefix (first remaining)) (rest remaining)))
-            {:pre prefix})))
-
 ; FIXME: Probably too expensive! Slow on Gen 4...
-(defn recursive-translation 
+(defn nested-graphics-composition 
     "A function that recursively translates entries and moves level down when it encounters lower-level structures"
     [sequence]
     (let [{prefix :pre
            lower-scope :scope
-           remaining :rest} (split-scopes sequence)]
+           remaining :rest} (fs/split-scopes sequence)]
         (let [prefix-translated (meta-t/fs-sequence->instructions prefix fs->quil)]
             (if lower-scope 
                 (let [variation (conj 
                                     (into 
                                         (into ['(quil.core/push-matrix)] prefix-translated)
-                                        (recursive-translation (:sequence lower-scope)) ) 
+                                        (nested-graphics-composition (:sequence lower-scope)) ) 
                                     '(quil.core/pop-matrix))]
                 (if (> (count remaining) 0)
-                    (let [temp (into variation (recursive-translation remaining))]
+                    (let [temp (into variation (nested-graphics-composition remaining))]
                         temp)
                     variation))
             prefix-translated))))
@@ -169,7 +158,7 @@
     [theorem]
     (fs/print-theorem theorem)
     (println "Translating formal system to quil instructions...")
-    (let [instructions (recursive-translation (:sequence theorem))]
+    (let [instructions (nested-graphics-composition (:sequence theorem))]
         (cons 'do instructions)))
 
 (defn make-glsl 

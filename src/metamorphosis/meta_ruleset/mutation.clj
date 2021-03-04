@@ -3,23 +3,6 @@
               [metamorphosis.meta-ruleset.formal-system.examples :as example]
               [metamorphosis.meta-ruleset.translation :as meta-t]))
 
-(defn glue 
-    "A function that returns an addition helper class that behaves as a fix and is aware of all copies"
-    ([n]
-     {:class :glue :values (list (inc n))})
-    ([n i]
-     {:class :glue :values (list (inc n) i)}))
-
-(defn has-lower-level? [entry]
-    "A function that returns true of false, wether an entry has a lower-level sequence"
-    (contains? entry :sequence))
-
-(defn meta-rate
-    "Function that given a sequence calculates the mutation rate 
-    of the lower scope based on a ratio between transform and property indeces"
-    [max copies remaining]
-    (* max (/ (- copies (dec remaining)) copies)))
-
 ; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
 ; TODO: Unit: creates something new (can clone a sequence, just an entry, and cherry pick sequences from different levels) 
 ; TODO: Transform: Changes the relationship between the entries in the sequence, 
@@ -34,7 +17,7 @@
     "A wrapper function that applies a unit function to every unit in a sequence 
     and applies a sequence function to lower level sequences"
     [sequence unit-property sequence-property]
-    (map #(cond (has-lower-level? %) (assoc % :sequence (sequence-property (:sequence %)))
+    (map #(cond (f/has-lower-level? %) (assoc % :sequence (sequence-property (:sequence %)))
                 (= (:class %) :unit) (unit-property %)
                 :else %) sequence))
 
@@ -109,6 +92,12 @@
     (let [units-count (count (:sequence structure))]
         (inc (mod (- units-count (:gen structure)) 6))))
 
+(defn meta-rate
+    "Function that given a sequence calculates the mutation rate 
+    of the lower scope based on a ratio between transform and property indeces"
+    [max copies remaining]
+    (* max (/ (- copies (dec remaining)) copies)))
+
         ;FIXME: SO BUGGY!!! Too many NILs, refactor to consider fall-backs and make more error-resistant
 (defn higher-order-> [mutation index]
     "Function that computes a sequence of one to three command classes by some deterministic algorithm"
@@ -118,7 +107,7 @@
           trans (filter #(f/command-class? :transform %) preprocessed)
           props (filter #(f/command-class? :property %) preprocessed)
           amounts (filter #(f/command-class? :amount %) preprocessed)
-          commands (map f/read-command-pair (partition 2 (filter #(not (has-lower-level? %)) preprocessed)))
+          commands (map f/read-command-pair (partition 2 (filter #(not (f/has-lower-level? %)) preprocessed)))
           initial-sequence (into (vector) 
                                 (f/build-command-pair
                                     :transform 
@@ -156,8 +145,7 @@
                  add-unit)))
         
  
-(defn count-sub-sequence-copies [sequence]
-    (count (filter has-lower-level? sequence)))
+
 
 ; How do you avoid recursion in here? IMPORTART: To make the point between meta and recursion
 ; Solution: It must be ignored and not resolved! So I need to filter out lower levels on translation and keep it in when its passed as input
@@ -166,7 +154,7 @@
     a partial sequence and that takes the same sequence as input and outputs a mutated version of it" 
     [part-sequence rate]
     (let [linear-command-list (meta-t/fs-sequence->instructions 
-                                    (filter #(not (has-lower-level? %)) 
+                                    (filter #(not (f/has-lower-level? %)) 
                                             part-sequence) 
                                     fs->mutation)]
         ((apply 
@@ -184,20 +172,20 @@
     [structure rate]
     (let [sequence (:sequence structure)
           gen (:gen structure)
-          copies (count-sub-sequence-copies sequence)]
+          copies (f/count-copies sequence)]
     (loop [new-sequence []
            remaining sequence
            index 0]
         (if (> (count remaining) 0)
             (let [next (first remaining)]
                 (recur (conj new-sequence
-                            (if (has-lower-level? next)
+                            (if (f/has-lower-level? next)
                                 (recursive-system-mutation next (if (> copies 0)
                                                                     (meta-rate rate copies (- copies index))
                                                                     rate))
                                 next))
                        (rest remaining)
-                       (if (has-lower-level? next)
+                       (if (f/has-lower-level? next)
                            (inc index)
                            index)))
             {:gen gen :sequence new-sequence}))))
@@ -209,16 +197,16 @@
     (let [times (repetitions structure)
           original structure]
         (loop [remaining times 
-               composition (conj (vector (glue times)) original)]
+               composition (vector original)]
             (if (> remaining 0)
                 (recur 
                     (dec remaining)
                     (let [variation (recursive-system-mutation structure (meta-rate 1.0 times remaining))]
                         (conj 
                             (into composition 
-                                (into (vector (glue times remaining)) (higher-order-> variation remaining))) 
+                                  (higher-order-> variation remaining)) 
                             variation)))
-                composition))))
+                (f/ready-> composition)))))
 
 
 ; ======= TEST FUNCTIONS ===============================
