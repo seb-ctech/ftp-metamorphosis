@@ -42,23 +42,20 @@
     "A function that manages the translation of instructions and caches already translated instructions"
     [state]
     (let [instructions 
-        (if
-            (contains? state :g-instructions)
-            (if 
-                (not= (:last-gen state) (get-in state [:theorem :gen]))
-                (let [new (t/make-quil (:theorem state))]
-                    (fs/print-theorem (:theorem state))
-                    new)
+        (if (contains? state :g-instructions)
+            (if (not= (:last-gen state) (get-in state [:theorem :gen]))
+                (let [new (t/make-quil (:theorem state))] new)
                 (:g-instructions state))
-            (do 
-                (t/make-quil (:theorem state))))]
+            (t/make-quil (:theorem state)))]
     (assoc (assoc state :g-instructions instructions)
             :last-gen (get-in state [:theorem :gen]))))
 
 (defn update-graphics 
     "A wrapper function that contains the main graphical updates."
     [state]
-    (handle-instructions state))
+    (if (nil? (:theorem state))
+        state
+        (handle-instructions state)))
 
 (defn draw-sketch 
     "Main function that renders a frame"

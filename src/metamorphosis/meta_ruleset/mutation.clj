@@ -109,40 +109,44 @@
     (let [units-count (count (:sequence structure))]
         (inc (mod (- units-count (:gen structure)) 6))))
 
+        ;FIXME: SO BUGGY!!! Too many NILs, refactor to consider fall-backs and make more error-resistant
 (defn higher-order-> [mutation index]
     "Function that computes a sequence of one to three command classes by some deterministic algorithm"
     (let [gen (:gen mutation)
-          units (filter #(f/command-class? :unit %) (:sequence mutation))
-          trans (filter #(f/command-class? :transform %) (:sequence mutation))
-          props (filter #(f/command-class? :property %) (:sequence mutation))
-          amounts (filter #(f/command-class? :amount %) (:sequence mutation))
-          commands (map f/read-command-pair (partition 2 (:sequence mutation)))
+          preprocessed (filter #(not (f/command-class? :glue %)) (:sequence mutation))
+          units (filter #(f/command-class? :unit %) preprocessed)
+          trans (filter #(f/command-class? :transform %) preprocessed)
+          props (filter #(f/command-class? :property %) preprocessed)
+          amounts (filter #(f/command-class? :amount %) preprocessed)
+          commands (map f/read-command-pair (partition 2 (filter #(not (has-lower-level? %)) preprocessed)))
           initial-sequence (into (vector) 
                                 (f/build-command-pair
                                     :transform 
                                     (:index (first units))
                                     (int (+ (/ (apply + (map #(:index %) amounts)) (inc (count amounts))) 2 (int (/ index 2)) gen))))
-          add-trans (if (< (count trans) 3) 
+                                test (do (println "Initial sequence: " initial-sequence))
+          add-trans (if (and (< (count trans) 3) (> (count trans) 0))
                         (into initial-sequence 
                             (f/build-command-pair
                                 :transform
                                 (- 8 (- (:index (last trans)) (:index (first trans))))
                                 (int (- (* (/ (apply + (map #(:amount %) commands)) (inc (count commands))) 2) 5 (int (/ index 2))))))
                         initial-sequence)
-          add-prop (if (< (count props) 3)
+          add-prop (if (and (< (count props) 3) (> (count props) 0))
                        (into add-trans 
                             (f/build-command-pair
                                 :property
-                                (get (filter #(not (or (map (fn [b] (= % b)) (map (fn [e] (:index e)) props))))) 
-                                        (reduce max 0 (map #(:index %) props)))
+                                (get (filter #(not (or (map (fn [b] (= % b)) (map (fn [e] (:index e)) props)))) (range 10)) 
+                                     (reduce max 0 (map #(:index %) props)))
                                 (int (+ (/ (apply + (map #(:index %) props)) (inc (count props))) 2))))
                         add-trans)
-          add-unit (if (< (count units) 3)
+          add-unit (if (and (< (count units) 3) (> (count units) 0))
                        (into add-prop 
                             (f/build-command-pair
                                 :unit
                                 (reduce min 100 (map #(:index %) units))
-                                (int (+ (/ (apply + (map #(:index %) units)) (inc (count units))) 2)))))]
+                                (int (+ (/ (apply + (map #(:index %) units)) (inc (count units))) 2))))
+                        add-prop)]
             (if  (f/command-class? :unit (last add-unit))
                  (into add-unit 
                     (f/build-command-pair
@@ -181,7 +185,6 @@
     (let [sequence (:sequence structure)
           gen (:gen structure)
           copies (count-sub-sequence-copies sequence)]
-        (println "Gen: " gen "Rate: " rate)
     (loop [new-sequence []
            remaining sequence
            index 0]

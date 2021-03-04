@@ -3,6 +3,7 @@
         [quil.core :as q]
         [metamorphosis.graphics.glsl-parsing :as glsl]
         [metamorphosis.meta-ruleset.translation :as meta-t]
+        [metamorphosis.meta-ruleset.formal-system.core :as fs]
         ;TODO: Remove after testing
         [metamorphosis.meta-ruleset.formal-system.examples :as example]))
 
@@ -166,6 +167,7 @@
 (defn make-quil
     "This is a function that transforms the formal system to a flattened valid quil instructions sequence"
     [theorem]
+    (fs/print-theorem theorem)
     (println "Translating formal system to quil instructions...")
     (let [instructions (recursive-translation (:sequence theorem))]
         (cons 'do instructions)))
