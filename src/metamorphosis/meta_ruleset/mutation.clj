@@ -128,7 +128,10 @@
                                 :transform
                                 (if (> (count trans) 0)
                                     (- 8 (- (:index (last trans)) (:index (first trans))))
-                                    (int (/ (+ index 4) (inc (- 3 index )))))
+                                    (int (/ (+ index 4) 
+                                            (if (> (inc (- 3 index )) 0)
+                                                (inc (- 3 index ))
+                                                1))))
                                 (int (- (* (average-value commands :amount) 2) 5 (int (/ index 2))))))
                         initial-sequence)
           add-prop (if (< (count props) 3)
@@ -138,7 +141,7 @@
                                 (reduce max 0 (filter #(not (map (fn [b] (= % b)) (map :index props))) (range 8)))
                                 (int (+ (average-value props :index) 2))))
                         add-trans)
-          add-unit (if (< (count units) 3)
+          add-unit (if (and (< (count units) 3) (> (count units) 0))
                        (into add-prop 
                             (f/build-command-pair
                                 :unit

@@ -10,3 +10,4 @@ pom.xml.asc
 *.glsl
 *.frag
 *.vert
+*.log

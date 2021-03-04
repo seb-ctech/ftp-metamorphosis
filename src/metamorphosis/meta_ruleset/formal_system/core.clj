@@ -145,8 +145,8 @@
                     (if (= (:gen theorem) 0)
                         (p/sequence->string (:sequence theorem))
                         (p/recursive-sequence (:gen theorem) 
-                                            (dec (:gen theorem)) 
-                                            (:sequence theorem)))
+                                              (:gen theorem) 
+                                              (:sequence theorem)))
                         "\n")]
         (do (spit "resources/theorem.log" output)
             (println output))))

@@ -81,18 +81,18 @@
                             (rest remaining)  
                             (inc index) 
                             (str final-string
+                                (nested-prefix top current)
                                 (if (= index 0)
                                     (gen-variation top next-index {:type :original :rep (get-repetitions (:sequence next))})
-                                    (str (nested-prefix top current) (gen-variation top next-index {:type :variation :index index})))
+                                    (gen-variation top next-index {:type :variation :index index}))
                                 (nested-prefix top current)
                                 (if (or (empty? prefix) (empty? (first prefix)))
                                     "" 
                                     (str (sequence->string prefix) next-entry))
                                 (if (= (:gen next) 0)
-                                    (str "[" (sequence->string (:sequence next)) "]" )
-                                    (recursive-sequence top next-index (:sequence next)))
-                                "\n"
-                                (nested-prefix top current) short-separator "\n")))
+                                    (str "[" (sequence->string (:sequence next)) "]" "\n")
+                                    (str "\n" (recursive-sequence top (dec current) (:sequence next))))
+                                (nested-prefix top current) short-separator "\n" "\n")))
                     (recur (conj prefix next)
                            (rest remaining)
                            index
