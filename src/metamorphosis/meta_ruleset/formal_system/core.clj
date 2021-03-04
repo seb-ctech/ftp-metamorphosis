@@ -140,11 +140,13 @@
 (defn print-theorem [theorem]
     (let [top-level (if (= (:gen theorem) 0)
                         (p/top-level-generation (:gen theorem))
-                        (p/top-level-generation (:gen theorem) (p/get-repetitions (:sequence theorem))))]
-        (println (str "\n" top-level "\n"
+                        (p/top-level-generation (:gen theorem) (p/get-repetitions (:sequence theorem))))
+         output (str "\n" top-level "\n"
                     (if (= (:gen theorem) 0)
                         (p/sequence->string (:sequence theorem))
                         (p/recursive-sequence (:gen theorem) 
                                             (dec (:gen theorem)) 
                                             (:sequence theorem)))
-                        "\n"))))
+                        "\n")]
+        (do (spit "resources/theorem.log" output)
+            (println output))))
