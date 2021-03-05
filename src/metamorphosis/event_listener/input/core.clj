@@ -56,8 +56,7 @@
                         (map #(:duration %) 
                                 sequence))]
     (map #(assoc % 
-            :duration (/ (:duration %) length)
-            :intensity (rand 1)) 
+            :duration (/ (:duration %) length)) 
             sequence)))
 
 (defn command-line [string]
