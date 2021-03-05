@@ -4,10 +4,9 @@
               [metamorphosis.meta-ruleset.translation :as meta-t]))
 
 ; These functions have n arguments for arbitrary parametrization, a mutation rate and the sequence as input.
-; TODO: Unit: creates something new (can clone a sequence, just an entry, and cherry pick sequences from different levels) 
+; TODO: Unit: creates something new (can clone a sequence, just an entry, and cherry pick sequences from different levels) or remove
 ; TODO: Transform: Changes the relationship between the entries in the sequence, 
 ; Property: applies some overall change to the next units (lower level sequences)
-; TODO: eliminate parameters. Just use Rate. 
 
 (defmacro ignore-glue [entry form]
     "A macro that can be used to make an if form as wrapper to return :glue unmodified"
@@ -172,7 +171,7 @@
                         (+ (average-value commands :amount) 3)))
                  add-unit)))
         
- 
+ ;TODO: Make deterministic
 (defn fuse-mutation 
     "A function that fuses an original sequence with a mutated one by a mutation rate"
     [original mutated rate]

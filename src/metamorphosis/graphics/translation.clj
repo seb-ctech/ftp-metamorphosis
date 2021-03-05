@@ -11,10 +11,7 @@
 ;from the L-System to a graphical instruction set
 
 
-;TODO: Find visual translation made out of composable functions that is fitting for a beginning motif. Ideally 3D:
-;      1. Every generation represents one layer of complexity contained in higher levels
-;      2. One Layer of complexity is made out of an algorithm that contains the algorithms of the lower levels
-;TODO: Adjust and play with these, for interesting results
+;TODO: Adjust glue to make composition fit screen better
 
 (def fs->quil {
     :glue [
