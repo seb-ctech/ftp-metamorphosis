@@ -12,14 +12,27 @@
             (filter #(= (second %) entry) 
                     (map-indexed vector sequence)))))
 
-(defn next-possible-entry 
+(defn cap-entry-amount
+    "A function that given an instruction list caps the index at the max and the min of that list length"
+    [params amount]
+    (if (and (vector? params) (> (count params) 0))
+        (let [max-index (dec (count params))
+              capped-index (cond (< amount 0)
+                                    (max 0 amount)
+                                 (> amount max-index)
+                                    (min amount max-index)
+                                :else amount)]
+            (get params capped-index))
+        (println (str "(Check instruction list) Not a vector or vector is empty: " params))))
+
+(defn wrap-entry-index 
     "A function that returns the next possible index of a sequence, 
     by wrapping around the length of the sequence. Also works with negative numbers"
     [vec index]
     (let [length (count vec)]
-            (if (and (sequential? vec) (> length 0))
+            (if (and (vector? vec) (> length 0))
                 (get vec (mod index length))
-                (println (str "Not a vector or vector is empty: " vec)))))
+                (println (str "(Check instruction list) Not a vector or vector is empty: " vec)))))
 
 (defn formal-system->form 
     "A function that serves as abstraction and can translate an entry 
@@ -30,9 +43,8 @@
           amount (:index amount)
           instruction (if (= class :glue) 
                           (first (translation-unit class))
-                          (do (when (nil? index)(println "Nil: " entry))
-                          (next-possible-entry (translation-unit class) index)))
-          params (when (second instruction) (next-possible-entry (second instruction) amount))]
+                          (wrap-entry-index (translation-unit class) index))
+          params (when (second instruction) (cap-entry-amount (second instruction) amount))]
           (if (= class :glue)
               (cons (first instruction) (:values entry))
               (if params
