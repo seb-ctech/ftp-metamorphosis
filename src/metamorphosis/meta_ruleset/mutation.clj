@@ -17,23 +17,35 @@
     "A wrapper function that applies a unit function to every unit in a sequence 
     and applies a sequence function to lower level sequences"
     [sequence unit-property sequence-property]
-    (map #(cond (f/has-lower-level? %) (assoc % :sequence (sequence-property (:sequence %)))
-                (= (:class %) :unit) (unit-property %)
-                :else %) sequence))
+    (f/ready-> (map #(cond (f/has-lower-level? %) 
+                            (assoc % :sequence (f/ready-> 
+                                                    (sequence-property 
+                                                        (f/transform-> (:sequence %)))))
+                           (= (:class %) :unit) 
+                            (unit-property %)
+                           :else %) 
+                    (f/transform-> sequence))))
+
+(defn protect-sequence 
+    "A function that applies a provided function only if the entry is not a sequence"
+    [entry f]
+    (if (f/has-lower-level? entry)
+        entry
+        (f entry)))
 
 (def fs->mutation {
     :glue [
         (list
             (fn 
-                ([n rate sequence]
+                ([n sequence]
                 sequence)
-                ([n x rate sequence]
+                ([n x sequence]
                     sequence)))
     ]
     :unit [
         ; Drop entry at target index
         (list 
-            (fn [n rate sequence] 
+            (fn [n sequence] 
                 (into (vector) 
                       (map #(second %) 
                             (filter #(not(= n (first %)))
@@ -41,7 +53,7 @@
             ['(0) '(1) '(2) '(3) '(4)])
         ; Duplicate entry at target index
         (list 
-            (fn [n rate sequence] 
+            (fn [n sequence] 
                 (into (vector)
                       (map #(second %) 
                             (reduce (fn [v entry]
@@ -56,7 +68,7 @@
     :transform [
         ; TODO: Swap two commands
         (list 
-            (fn [n rate sequence]
+            (fn [n sequence]
                 (let [first-cut (split-at 
                                 (dec n) 
                                 (partition 2 sequence))
@@ -70,18 +82,20 @@
     :property [
         ; Decrement all by 1
         (list 
-            (fn [rate sequence]
-                (let [unit-f #(assoc % :index
-                                (dec (:index %)))
-                      seq-f #(map (fn [entry] (unit-f entry))
+            (fn [sequence]
+                (let [unit-f #(do 
+                                (when (nil? (:index %)) (println "Nil: " %))
+                                (update % :index dec))
+                      seq-f #(map (fn [entry] (protect-sequence entry unit-f))
                                   %)]
                 (apply-property sequence unit-f seq-f))))
         ; Increment all by 1
         (list 
-            (fn [rate sequence]
-                    (let [unit-f #(assoc % :index
-                                    (inc (:index %)))
-                          seq-f #(map (fn [entry] (unit-f entry))
+            (fn [sequence]
+                    (let [unit-f #(do 
+                                    (when (nil? (:index %)) (println "Nil: " %))
+                                    (update % :index inc))
+                          seq-f #(map (fn [entry] (protect-sequence entry unit-f))
                                       %)]
                     (apply-property sequence unit-f seq-f))))
     ]
@@ -98,7 +112,6 @@
     [max copies remaining]
     (* max (/ (- copies (dec remaining)) copies)))
 
-        ;FIXME: SO BUGGY!!! Too many NILs, refactor to consider fall-backs and make more error-resistant
 (defn higher-order-> [mutation index]
     "Function that computes a sequence of one to three command classes by some deterministic algorithm"
     (let [gen (:gen mutation)
@@ -163,7 +176,20 @@
 (defn fuse-mutation 
     "A function that fuses an original sequence with a mutated one by a mutation rate"
     [original mutated rate]
-    mutated)
+    (let [original (f/group-sequence original)
+          mutated (f/group-sequence mutated)
+          length (max (count original) (count mutated))]
+        (loop [index 0
+               new-sequence []]
+               (if (< index length)
+                   (recur (inc index) (conj new-sequence (if (< (rand 1.0) rate)
+                                                             (if (get mutated index) 
+                                                                (get mutated index)
+                                                                (get original index))
+                                                             (if (get original index)
+                                                                (get original index)
+                                                                (get mutated index)))))
+                    (f/ready-> (f/ungroup-sequence new-sequence))))))
 
 ; How do you avoid recursion in here? IMPORTART: To make the point between meta and recursion
 ; Solution: It must be ignored and not resolved! So I need to filter out lower levels on translation and keep it in when its passed as input
@@ -174,7 +200,7 @@
     (let [linear-command-list (meta-t/fs-sequence->instructions 
                                     (filter #(not (f/has-lower-level? %)) 
                                         part-sequence) 
-                                    fs->mutation)]
+                                        fs->mutation)]
         (fuse-mutation part-sequence 
             ((apply comp 
                     (map #(if (seq? %) 
@@ -205,7 +231,7 @@
                        (if (f/has-lower-level? next)
                            (inc index)
                            index)))
-            {:gen gen :sequence new-sequence}))))
+            {:gen gen :sequence (meta-mutate-sequence new-sequence rate)}))))
 
 (defn meta-mutate [structure]
     "Function that takes the previous generation's structure as input makes 

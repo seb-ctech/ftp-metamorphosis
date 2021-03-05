@@ -78,7 +78,7 @@
     "a function that modifies a ready sequence so that it can be easily transformed"
     [r-sequence]
     (if (has-sub-seq? r-sequence)
-        (filter #(not (command-class? :glue %)) r-sequence)
+        (into (vector) (filter #(not (command-class? :glue %)) r-sequence))
         r-sequence))
 
 (defn ready-> 
