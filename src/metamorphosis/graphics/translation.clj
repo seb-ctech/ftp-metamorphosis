@@ -17,7 +17,7 @@
     :glue [
         (list
             (fn ([n]  
-                    (q/scale (* (/ 1.0 n) (+ 1.0 (* 0.2 n)))))
+                    (q/scale (* (/ 1.0 n) 1.3)))
                 ([n i]
                     (when (> i 1) (q/pop-matrix))
                     (q/push-matrix))))
