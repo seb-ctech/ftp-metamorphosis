@@ -26,39 +26,44 @@
 (def fs->quil {
     :glue [
         (list
-            (fn ([n]  
-                    (q/scale (* (/ 1.0 n) 1.3)))
-                ([n i]
-                    (when (> i 1) (q/pop-matrix))
-                    (q/push-matrix))))
+            (fn ([n])
+                ([n i])))
     ]
     :unit [
         (list 
-            (fn [a b c d] 
-                (q/ellipse a b c d))
+            (fn [w h] 
+                (q/ellipse 0 0 (* w (/ (q/width) 2)) (* h (/ (q/height) 2))))
             [
-                '(0 0 100 100)
-                '(0 0 100 200)
-                '(0 0 200 100)
-                '(0 0 200 50)
-                '(0 0 50 200)])
+                '(0.5 0.5)
+                '(0.5 1.0)
+                '(1.0 0.5)
+                '(1.0 0.2)
+                '(0.2 1.0)])
         (list
-            (fn [a b c d]
-                (q/rect a b c d))
+            (fn [w h]
+                (q/rect 0 0 (* w (/ (q/width) 2)) (* h (/ (q/height) 2))))
             [
-                '(0 0 100 100)
-                '(0 0 100 200)
-                '(0 0 200 100)
-                '(0 0 200 50)
-                '(0 0 50 200)])
+                '(0.5 0.5)
+                '(0.5 1.0)
+                '(1.0 0.5)
+                '(1.0 0.2)
+                '(0.2 1.0)])
         (list
-            (fn [a b c d e f] 
-                (q/triangle a b c d e f)) 
+            (fn [a b c d e f]
+                (let [w (/ (q/width) 2)
+                      h (/ (q/height) 2)]
+                (q/triangle 
+                    (* a w)
+                    (* b h)
+                    (* c w)
+                    (* d h)
+                    (* e w)
+                    (* f h)))) 
             [
-                '(-20 0 5 -40 20 10)
-                '(-10 5 5 10 5 -30)
-                '(-30 5 0 -20 30 5)
-                '(-20 10 0 -20 20 10)])]
+                '(-0.2 0 0.05 0.4 0.2 0.1)
+                '(-0.1 0.05 0.05 0.1 0.05 -0.3)
+                '(-0.3 0.05 0.0 -0.2 0.3 0.05)
+                '(-0.2 0.1 0.0 -0.2 0.2 0.1)])]
     :transform [
         (list 
             (fn [a]
@@ -186,31 +191,29 @@
                 '(30.0)
                 '(40.0)])]})
 
-; FIXME: Probably too expensive! Slow on Gen 4...
-(defn nested-graphics-composition 
+(defn compose-scope 
     "A function that recursively translates entries and moves level down when it encounters lower-level structures"
     [sequence]
-    (let [{prefix :pre
-           lower-scope :scope
-           remaining :rest} (fs/split-scopes sequence)]
-        (let [prefix-translated (meta-t/fs-sequence->instructions prefix fs->quil)]
-            (if lower-scope 
-                (let [variation (conj 
-                                    (into 
-                                        (into ['(quil.core/push-matrix)] prefix-translated)
-                                        (nested-graphics-composition (:sequence lower-scope)) ) 
-                                    '(quil.core/pop-matrix))]
-                (if (> (count remaining) 0)
-                    (let [temp (into variation (nested-graphics-composition remaining))]
-                        temp)
-                    variation))
-            prefix-translated))))
+    (let [nested? (fs/has-sub-seq? sequence)]
+        (if nested?
+            (let [copies (fs/count-copies sequence)
+                  scale (if (> copies 0)(/ 1.0 copies) 1.0)]
+                (loop [{prefix :pre
+                        lower-scope :scope
+                        remaining :rest} (fs/split-scopes sequence)
+                        scoped-instructions ['(quil.core/push-matrix) (list 'quil.core/scale scale)]]
+                        (let [prefixed-sub-seq (into (into scoped-instructions prefix) (compose-scope lower-scope))]
+                            (if remaining
+                                (recur (fs/split-scopes remaining) prefixed-sub-seq)
+                                (conj prefixed-sub-seq '(quil.core/pop-matrix)))))
+            (meta-t/fs-sequence->instructions sequence fs->quil)))))
 
 (defn make-quil
     "This is a function that transforms the formal system to a flattened valid quil instructions sequence"
     [theorem]
-    ;(fs/print-theorem theorem)
-    (let [instructions (nested-graphics-composition (:sequence theorem))]
+    (fs/print-theorem theorem)
+    (let [instructions (compose-scope (:sequence theorem))]
+        (println instructions)
         (cons 'do instructions)))
 
 (defn make-glsl 

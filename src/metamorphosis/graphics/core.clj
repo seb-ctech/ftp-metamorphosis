@@ -29,7 +29,10 @@
     "Function that evaluates the instruction set to render the current generation"
     [instructions]
     (q/push-style)
+    (q/push-matrix)
+    (q/translate (/ (q/width) 2) (/ (q/height) 2))
     (eval instructions)
+    (q/pop-matrix)
     (q/pop-style))
 
 (defn setup-sketch 
@@ -106,6 +109,7 @@
         (q/push-matrix)
         (q/translate margin (/ (q/height) 2))
         (q/push-matrix)
+        (q/push-style)
         (doseq [input seq]
             (let [duration (float (/ (:duration input) (apply + (map :duration seq))))
                   width (* seq-width duration)
@@ -129,6 +133,7 @@
                         (q/text (name signal) 0 0 )
                         (q/pop-matrix)))
                 (q/translate (+ width padding) 0)))
+        (q/pop-style)
         (q/pop-matrix)
         (q/pop-matrix))))
 

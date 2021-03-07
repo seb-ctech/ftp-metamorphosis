@@ -7,7 +7,7 @@
 
 (def resolution [1000 1000])
 (def evolving-interval 20)
-(def max-generations 4)
+(def max-generations 1)
 
 (defn init 
   "Function that sets the initial state for the program"
@@ -33,7 +33,8 @@
           new-input (:input event)]
       (if restart?
         (do (println "Restarting! \n \n")
-            (u/reset-time (assoc state :theorem (msys/first-generation new-input))))
+            (u/reset-time (assoc state :theorem (msys/first-generation new-input)
+                                       :last-gen nil)))
         (if (and (contains? state :theorem) 
                  (u/time-up? state) 
                  (< (get-in state [:theorem :gen]) max-generations))
