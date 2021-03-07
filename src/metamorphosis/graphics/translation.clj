@@ -10,8 +10,18 @@
 ;This module contains translation functions that convert the abstract theorem structure 
 ;from the L-System to a graphical instruction set
 
+(def palette [
+    '(18 23 23)
+    '(30 46 51)
+    '(145 161 95)
+    '(82 176 104)
+    '(38 232 154)
+    '(255 180 66)
+])
 
 ;TODO: Adjust glue to make composition fit screen better
+
+
 
 (def fs->quil {
     :glue [
@@ -199,8 +209,7 @@
 (defn make-quil
     "This is a function that transforms the formal system to a flattened valid quil instructions sequence"
     [theorem]
-    (fs/print-theorem theorem)
-    (println "Translating formal system to quil instructions...")
+    ;(fs/print-theorem theorem)
     (let [instructions (nested-graphics-composition (:sequence theorem))]
         (cons 'do instructions)))
 

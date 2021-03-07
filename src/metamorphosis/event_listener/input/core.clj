@@ -48,8 +48,7 @@
     "A function that returns a future thread that waits for a timeout to resolve"
     []
     (clojure.core/future 
-        (Thread/sleep input-interval) 
-        (println "Finished Recording")))
+        (Thread/sleep input-interval)))
 
 (defn process-input-sequence [sequence]
     (let [length (apply + 

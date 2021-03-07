@@ -6,7 +6,6 @@
     (:gen-class)) 
 
 (defn next-step [structure]
-    (println "Next generation " (inc (:gen structure)) " -->")
         {:gen (inc (:gen structure)) 
             :sequence (m/meta-mutate structure)})
 
@@ -14,7 +13,6 @@
     (next-step theorem))
     
 (defn first-generation [input-sequence]
-    (println "Sequence: " input-sequence)
     (f/build-axiom (tr/process-input input-sequence)))
 
 ;==== TEST FUNCTIONS ======

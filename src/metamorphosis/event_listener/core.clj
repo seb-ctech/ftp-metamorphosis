@@ -19,7 +19,6 @@
                     state)]
         (if (:triggered? state)
             (let [state (assoc state :triggered? false :recording? true)]
-                (println "Triggered!")
                 (assoc state :event-recorder (in/record-input) :input-sequence []))
             (if (:event-recorder state)
                 (if (realized? (:event-recorder state))

@@ -17,7 +17,8 @@
                     :count 0 
                     :target evolving-interval}
             :last-gen 0
-            :input-sequence [])))
+            :input-sequence []
+            :max-gen max-generations)))
 
 (defn metamorph-loop
   "The main program loop which functions as wrapper for the three main systems: 

@@ -82,18 +82,14 @@
         ; Decrement all by 1
         (list 
             (fn [sequence]
-                (let [unit-f #(do 
-                                (when (nil? (:index %)) (println "Nil: " %))
-                                (update % :index dec))
+                (let [unit-f #(update % :index dec)
                       seq-f #(map (fn [entry] (protect-sequence entry unit-f))
                                   %)]
                 (apply-property sequence unit-f seq-f))))
         ; Increment all by 1
         (list 
             (fn [sequence]
-                    (let [unit-f #(do 
-                                    (when (nil? (:index %)) (println "Nil: " %))
-                                    (update % :index inc))
+                    (let [unit-f #(update % :index inc)
                           seq-f #(map (fn [entry] (protect-sequence entry unit-f))
                                       %)]
                     (apply-property sequence unit-f seq-f))))
