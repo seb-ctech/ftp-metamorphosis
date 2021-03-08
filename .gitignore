@@ -11,3 +11,5 @@ pom.xml.asc
 *.frag
 *.vert
 *.log
+*.txt
+/resources/results/**
