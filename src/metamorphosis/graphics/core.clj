@@ -180,4 +180,4 @@
             :draw draw-sketch
             :key-pressed key/key-pressed
             :key-released key/key-released
-            :middleware [m/fun-mode m/navigation-2d]))
+            :middleware [m/fun-mode]))
