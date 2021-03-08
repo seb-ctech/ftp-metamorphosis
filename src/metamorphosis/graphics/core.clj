@@ -62,7 +62,7 @@
     (if (nil? (:theorem state))
         state
         (do 
-            (when (get-in state [:time :finished?])
+            (when (= (get-in state [:time :count]) (int (/ (get-in state [:time :target]) 5)))
                   (rec/save-generation state))
             (handle-instructions state))))
 
