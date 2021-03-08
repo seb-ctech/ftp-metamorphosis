@@ -7,7 +7,7 @@
 
 (def resolution [1000 1000])
 (def evolving-interval 20)
-(def max-generations 1)
+(def max-generations 4)
 
 (defn init 
   "Function that sets the initial state for the program"

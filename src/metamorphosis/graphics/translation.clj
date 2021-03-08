@@ -69,7 +69,7 @@
             (fn [a]
                 (q/scale a))
             [
-                '(0.2)
+                '(0.4)
                 '(0.5)
                 '(0.7)
                 '(0.8)
@@ -79,55 +79,47 @@
                 '(1.2)
                 '(1.3)
                 '(1.5)
-                '(1.8)])
+                '(1.7)
+                '(1.9)
+                '(2.1)
+                '(2.3)
+                '(2.5)])
         (list
             (fn [x] 
-                (q/translate (* 1 x) (* -1 x)))
+                (q/translate (/ (* 1 x (q/width)) 2) (/ (* -1 x (q/height)) 2)))
             [
-                '(10)
-                '(20)
-                '(40)
-                '(60)
-                '(100)
-                '(140)
-                '(200)
-                '(300)])
+                '(0.1)
+                '(0.2)
+                '(0.3)
+                '(0.4)
+                ])
         (list
             (fn [x] 
-                (q/translate (* -1 x) (* 1 x)))
+                (q/translate (* -1 x (q/width)) (* 1 x (q/height))))
             [
-                '(10)
-                '(20)
-                '(40)
-                '(60)
-                '(100)
-                '(140)
-                '(200)
-                '(300)])
+                '(0.1)
+                '(0.2)
+                '(0.3)
+                '(0.4)
+                ])
         (list
             (fn [x] 
-                (q/translate (* 1 x) (* 1 x)))
+                (q/translate (/ (* -1 x (q/width)) 2) (/ (* -1 x (q/height)) 2)))
             [
-                '(10)
-                '(20)
-                '(40)
-                '(60)
-                '(100)
-                '(140)
-                '(200)
-                '(300)])
+                '(0.1)
+                '(0.2)
+                '(0.3)
+                '(0.4)
+                ])
         (list
             (fn [x] 
-                (q/translate (* -1 x) (* -1 x)))
+                (q/translate (/ (* 1 x (q/width)) 2) (/ (* 1 x (q/height)) 2)))
             [
-                '(10)
-                '(20)
-                '(40)
-                '(60)
-                '(100)
-                '(140)
-                '(200)
-                '(300)])
+                '(0.1)
+                '(0.2)
+                '(0.3)
+                '(0.4)
+                ])
         (list
             (fn [a]
                 (q/rotate a)) 
@@ -175,9 +167,6 @@
             (fn [w] 
                 (q/stroke-weight w)) 
             [
-                '(0.5)
-                '(0.8)
-                '(1.0)
                 '(2.0)
                 '(3.0)
                 '(4.0)
@@ -194,26 +183,31 @@
 (defn compose-scope 
     "A function that recursively translates entries and moves level down when it encounters lower-level structures"
     [sequence]
-    (let [nested? (fs/has-sub-seq? sequence)]
-        (if nested?
-            (let [copies (fs/count-copies sequence)
-                  scale (if (> copies 0)(/ 1.0 copies) 1.0)]
-                (loop [{prefix :pre
-                        lower-scope :scope
-                        remaining :rest} (fs/split-scopes sequence)
-                        scoped-instructions ['(quil.core/push-matrix) (list 'quil.core/scale scale)]]
-                        (let [prefixed-sub-seq (into (into scoped-instructions prefix) (compose-scope lower-scope))]
-                            (if remaining
-                                (recur (fs/split-scopes remaining) prefixed-sub-seq)
-                                (conj prefixed-sub-seq '(quil.core/pop-matrix)))))
-            (meta-t/fs-sequence->instructions sequence fs->quil)))))
+    (if (fs/has-sub-seq? sequence)
+        (let [copies (fs/count-copies sequence)
+              scale (if (> copies 0)
+                        (/ 1.0 (* copies 0.4))
+                        1.0)]
+            (loop [{prefix :pre
+                    lower-scope :scope
+                    remaining :rest} (fs/split-scopes sequence)
+                    scoped-instructions [] ]
+                    (let [prefixed-sub-seq (conj (into (conj scoped-instructions '(quil.core/push-matrix))
+                                                (into (meta-t/fs-sequence->instructions prefix fs->quil) 
+                                                        (conj (into ['(quil.core/push-matrix) (list 'quil.core/scale scale)] 
+                                                                (compose-scope (:sequence lower-scope))) 
+                                                            '(quil.core/pop-matrix))))
+                                                '(quil.core/pop-matrix))]
+                        (if remaining
+                            (recur (fs/split-scopes remaining) prefixed-sub-seq)
+                            (conj prefixed-sub-seq)))))
+        (meta-t/fs-sequence->instructions sequence fs->quil)))
 
 (defn make-quil
     "This is a function that transforms the formal system to a flattened valid quil instructions sequence"
     [theorem]
     (fs/print-theorem theorem)
     (let [instructions (compose-scope (:sequence theorem))]
-        (println instructions)
         (cons 'do instructions)))
 
 (defn make-glsl 
