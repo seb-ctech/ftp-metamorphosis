@@ -96,6 +96,16 @@
                     (q/rect 0 0 (* spacing 0.95) 4)))
             (q/pop-matrix))
         (q/pop-matrix)
+        (let [width (* spacing (inc max))
+              time (:time state)]
+            (q/push-matrix)
+            (q/push-style)
+            (q/stroke 255)
+            (q/stroke-weight 1)
+            (q/translate padding (+ 4 (* padding 2) 2))
+            (q/line 0 0 (* width (/ (inc (:count time)) (:target time))) 0)
+            (q/pop-style)
+            (q/pop-matrix))
         (q/pop-matrix)))
             
 
