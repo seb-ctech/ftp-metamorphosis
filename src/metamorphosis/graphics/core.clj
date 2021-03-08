@@ -171,10 +171,11 @@
     "A function that builds a graphical container as quil sketch and passes in the most important high-level functions"
     [size setup update-loop]
         (q/sketch 
+            :title "Metamorphosis"
             :size size 
             :display 2
             :features [:keep-on-top]
-            :renderer :p2d
+            :renderer :java2d
             :setup setup
             :update update-loop
             :draw draw-sketch
