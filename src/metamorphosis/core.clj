@@ -6,7 +6,7 @@
   (:gen-class))
 
 (def resolution [1000 1000])
-(def evolving-interval 20)
+(def evolving-interval 10)
 (def max-generations 4)
 
 (defn init 
@@ -33,6 +33,7 @@
           new-input (:input event)]
       (if restart?
         (do (println "Restarting! \n \n")
+            (u/update-result-log)
             (u/reset-time (assoc state :theorem (msys/first-generation new-input)
                                        :last-gen nil)))
         (if (and (contains? state :theorem) 

@@ -3,6 +3,7 @@
               [quil.middleware :as m]
               [metamorphosis.meta-ruleset.formal-system.core :as fs]
               [metamorphosis.graphics.translation :as t]
+              [metamorphosis.graphics.record-step :as rec]
               [metamorphosis.event-listener.input.keyboard :as key])
     (:gen-class))
 
@@ -60,7 +61,10 @@
     [state]
     (if (nil? (:theorem state))
         state
-        (handle-instructions state)))
+        (do 
+            (when (get-in state [:time :finished?])
+                  (rec/save-generation state))
+            (handle-instructions state))))
 
 (defn generation-indicator [state]
     (let [{max :max-gen

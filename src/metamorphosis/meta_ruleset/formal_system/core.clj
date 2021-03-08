@@ -137,15 +137,19 @@
     "A function that given a list of parameters builds a valid sequence"
     [])
 
-(defn print-theorem [theorem]
-    (let [top-level (if (= (:gen theorem) 0)
-                        (p/top-level-generation (:gen theorem))
-                        (p/top-level-generation (:gen theorem) (p/get-repetitions (:sequence theorem))))
-         output (str "\n" top-level "\n"
-                    (if (= (:gen theorem) 0)
-                        (p/sequence->string (:sequence theorem))
-                        (p/recursive-sequence (:gen theorem) 
-                                              (:gen theorem) 
-                                              (:sequence theorem)))
-                        "\n")]
-        (do (spit "resources/theorem.log" output))))
+(defn print-theorem 
+    "A function that prints in a readable way the current theorem structure to a log file"
+    ([theorem]
+        (print-theorem theorem "resources"))
+    ([theorem path]
+        (let [top-level (if (= (:gen theorem) 0)
+                            (p/top-level-generation (:gen theorem))
+                            (p/top-level-generation (:gen theorem) (p/get-repetitions (:sequence theorem))))
+            output (str "\n" top-level "\n"
+                        (if (= (:gen theorem) 0)
+                            (p/sequence->string (:sequence theorem))
+                            (p/recursive-sequence (:gen theorem) 
+                                                (:gen theorem) 
+                                                (:sequence theorem)))
+                            "\n")]
+            (spit (str path "/" "theorem.log") output))))

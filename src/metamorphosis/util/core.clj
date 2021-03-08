@@ -1,5 +1,7 @@
 (ns metamorphosis.util.core)
 
+(def results-counter "resources/record-result.txt")
+
 (defn handle-timer [state]
     "A function that updates a time map with a counter"
     (let [time (:time state)
@@ -26,3 +28,12 @@
     "A function that returns true or false if the time finished or not"
     (let [time (:time state)]
         (:finished? time)))
+
+(defn get-result-counter []
+    (Integer/parseInt (slurp results-counter)))
+
+(defn update-result-log []
+    "A function that checks the record-result file and increments the number to keep track of the version"
+    (if (.exists (clojure.java.io/file results-counter))
+        (spit results-counter (str (inc (get-result-counter))))
+        (spit results-counter (str 1))))
