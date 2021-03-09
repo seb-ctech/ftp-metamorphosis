@@ -1,6 +1,8 @@
 (ns metamorphosis.util.core)
 
+(def theorem-log "resources/theorem.log")
 (def results-counter "resources/record-result.txt")
+(def results-root "resources/results")
 
 (defn handle-timer [state]
     "A function that updates a time map with a counter"
@@ -37,3 +39,17 @@
     (if (.exists (clojure.java.io/file results-counter))
         (spit results-counter (str (inc (get-result-counter))))
         (spit results-counter (str 1))))
+
+(def number-length 4)
+(defn number-padding 
+    "A function that given a number compares it with the target length and pads the number"
+    [n]
+    (let [padding (- number-length (count (str n)))]
+        (str (apply str (repeat padding 0)) (str n))))
+
+(defn save-theorem
+    "A function that stores the current printed theorem in the current results folder"
+    [state]
+    (when (:theorem state)
+          (let [result (number-padding (get-result-counter))]
+          (spit (str results-root "/" result "/" "theorem.log") (slurp theorem-log)))))

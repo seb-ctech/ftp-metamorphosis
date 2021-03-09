@@ -4,6 +4,7 @@
               [metamorphosis.meta-ruleset.formal-system.core :as fs]
               [metamorphosis.graphics.translation :as t]
               [metamorphosis.graphics.record-step :as rec]
+              [metamorphosis.util.core :as u]
               [metamorphosis.event-listener.input.keyboard :as key])
     (:gen-class))
 
@@ -63,10 +64,13 @@
         state
         (do 
             (when (and (not (:recording? state)) (= (get-in state [:time :count]) (int (/ (get-in state [:time :target]) 5))))
-                  (rec/save-generation state))
+                  (rec/save-generation state)
+                  (u/save-theorem state))
             (handle-instructions state))))
 
-(defn generation-indicator [state]
+(defn generation-indicator 
+    "A function that renders the generation indicator component of the UI"
+    [state]
     (let [{max :max-gen
            theorem :theorem} state
            current (:gen theorem)
@@ -109,7 +113,9 @@
         (q/pop-matrix)))
             
 
-(defn input-recording [state]
+(defn input-recording 
+    "A function that renders the input sequence while recording"
+    [state]
     (let [{rec :recording?
            seq :input-sequence} state
            colors t/palette
@@ -151,7 +157,9 @@
         (q/pop-matrix)
         (q/pop-matrix))))
 
-(defn draw-user-feedback [state]
+(defn draw-user-feedback 
+    "A handler function that contains and renders the UI components"
+    [state]
     (input-recording state)
     (when (:theorem state) (generation-indicator state)))
 
@@ -160,7 +168,7 @@
     [state]
     (q/background 0)
     (q/no-stroke)
-    (q/fill 18 23 23)
+    (apply q/fill (t/palette 0))
     (if (= (:mode state) :glsl)
         (render-shader (:shader state))
         (when (contains? state :theorem)
@@ -168,7 +176,7 @@
     (draw-user-feedback state))
 
 (defn start-visualization 
-    "A function that builds a graphical container as quil sketch and passes in the most important high-level functions"
+    "A function that builds a graphical container as quil sketch and passes in the main program loop and setup function"
     [size setup update-loop]
         (q/sketch 
             :title "Metamorphosis"

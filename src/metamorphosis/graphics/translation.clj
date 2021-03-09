@@ -3,12 +3,9 @@
         [quil.core :as q]
         [metamorphosis.graphics.glsl-parsing :as glsl]
         [metamorphosis.meta-ruleset.translation :as meta-t]
-        [metamorphosis.meta-ruleset.formal-system.core :as fs]
-        ;TODO: Remove after testing
-        [metamorphosis.meta-ruleset.formal-system.examples :as example]))
+        [metamorphosis.meta-ruleset.formal-system.core :as fs]))
 
-;This module contains translation functions that convert the abstract theorem structure 
-;from the L-System to a graphical instruction set
+;== PALETTE: A centralized palette that defines the colors for all graphical components
 
 (def palette [
     '(18 23 23)
@@ -19,9 +16,7 @@
     '(255 180 66)
 ])
 
-;TODO: Adjust glue to make composition fit screen better
-
-
+;=== GRAPHICAL TRANSLATION UNIT =======
 
 (def fs->quil {
     :glue [
@@ -140,23 +135,11 @@
         (list 
             (fn [r g b]
                 (q/fill r g b)) 
-            [
-                '(18 23 23)
-                '(30 46 51)
-                '(145 161 95)
-                '(82 176 104)
-                '(38 232 154)
-                '(255 180 66)])
+            palette)
         (list
             (fn [r g b] 
                 (q/stroke r g b))  
-            [
-                '(18 23 23)
-                '(30 46 51)
-                '(145 161 95)
-                '(82 176 104)
-                '(38 232 154)
-                '(255 180 66)])
+            palette)
         (list 
             (fn [] 
                 (q/no-stroke)))
@@ -181,7 +164,9 @@
                 '(40.0)])]})
 
 (defn compose-scope 
-    "A function that recursively translates entries and moves level down when it encounters lower-level structures"
+    "A function that converts the nested formal system to a linear list of quil instructions by using the fs->quil translation unit. 
+    It unravels recursively each scope as a combination of prefix entries and sub-sequence and wraps them into a pop and push matrix, 
+    as well as handling the scaling to fit them on screen."
     [sequence]
     (if (fs/has-sub-seq? sequence)
         (let [copies (fs/count-copies sequence)
@@ -204,7 +189,7 @@
         (meta-t/fs-sequence->instructions sequence fs->quil)))
 
 (defn make-quil
-    "This is a function that transforms the formal system to a flattened valid quil instructions sequence"
+    "This is a function that converts the current theorem to quil instructions"
     [theorem]
     (fs/print-theorem theorem)
     (let [instructions (compose-scope (:sequence theorem))]
