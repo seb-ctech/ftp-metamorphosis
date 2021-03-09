@@ -8,7 +8,9 @@
 
 (def input-listen-interval 100)
 
-(defn command-line [string]
+(defn command-line 
+    "A function that handles command-line input"
+    [string]
     (in/command-line string))
 
 (defn listen-for-event 

@@ -22,8 +22,6 @@
 ; ==============================================
 
 (def input-interval 4000)
-(def a-input "a")
-
 
 (defn basic-keyboard 
     "A function that takes the input state a composes a sequence of abstract input signals based on keyboard input"
@@ -50,7 +48,9 @@
     (clojure.core/future 
         (Thread/sleep input-interval)))
 
-(defn process-input-sequence [sequence]
+(defn process-input-sequence 
+    "A function that goes over an assembled input sequence and processes it to a finalized version"
+    [sequence]
     (let [length (apply + 
                         (map #(:duration %) 
                                 sequence))]
@@ -58,5 +58,7 @@
             :duration (/ (:duration %) length)) 
             sequence)))
 
-(defn command-line [string]
+(defn command-line 
+    "A function that translates an input string to an input sequence"
+    [string]
     (cl/string->input string))
