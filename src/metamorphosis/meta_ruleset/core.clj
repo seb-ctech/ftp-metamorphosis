@@ -5,14 +5,15 @@
         [metamorphosis.meta-ruleset.translation :as tr])
     (:gen-class)) 
 
-(defn next-step [structure]
+(defn evolve-next-generation
+    "A function that progresses the structure from the previous generation to the next"
+    [structure]
         {:gen (inc (:gen structure)) 
             :sequence (m/meta-mutate structure)})
-
-(defn evolve-next-generation [theorem]
-    (next-step theorem))
     
-(defn first-generation [input-sequence]
+(defn first-generation 
+    "A function that produces the first generation by a given user input"
+    [input-sequence]
     (f/build-axiom (tr/process-input input-sequence)))
 
 ;==== TEST FUNCTIONS ======

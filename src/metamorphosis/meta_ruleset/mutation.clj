@@ -8,9 +8,12 @@
 ; TODO: Transform: Changes the relationship between the entries in the sequence, 
 ; Property: applies some overall change to the next units (lower level sequences)
 
-(defmacro ignore-glue [entry form]
+(defmacro ignore-glue
     "A macro that can be used to make an if form as wrapper to return :glue unmodified"
-    `(if (= (:class ~entry) :glue) ~entry ~form))
+    [entry form]
+    `(if (= (:class ~entry) :glue) 
+        ~entry 
+        ~form))
 
 (defn apply-property 
     "A wrapper function that applies a unit function to every unit in a sequence 
@@ -31,6 +34,8 @@
     (if (f/has-lower-level? entry)
         entry
         (f entry)))
+
+;=== META-MUTATION TRANSLATION UNIT =======
 
 (def fs->mutation {
     :glue [
@@ -96,8 +101,9 @@
     ]
 })
 
-(defn repetitions [structure]
-    "Function that uses a deterministic algorithm to determine an amount between 1 and 7 for the next step"
+(defn repetitions
+    "Function that uses a deterministic algorithm to determine an amount between 1 and 7 based on the current structure"
+    [structure]
     (let [units-count (count (:sequence structure))]
         (inc (mod (- units-count (:gen structure)) 6))))
 
@@ -107,8 +113,10 @@
     [max copies remaining]
     (* max (/ (- copies (dec remaining)) copies)))
 
-(defn higher-order-> [mutation index]
-    "Function that computes a sequence of one to three command classes by some deterministic algorithm"
+(defn higher-order->
+    "Function that computes a sequence of one to three command classes 
+    by some chaotic deterministic algorithm wich is appended before a mutated copy"
+    [mutation index]
     (let [gen (:gen mutation)
           transformable (f/transform-> (:sequence mutation))
           units (filter #(f/command-class? :unit %) transformable)
@@ -167,7 +175,6 @@
                         (+ (average-value commands :amount) 3)))
                  add-unit)))
         
- ;TODO: Make deterministic
 (defn fuse-mutation 
     "A function that fuses an original sequence with a mutated one by a mutation rate"
     [original mutated rate]
@@ -228,10 +235,11 @@
                            index)))
             {:gen gen :sequence (meta-mutate-sequence new-sequence rate)}))))
 
-(defn meta-mutate [structure]
+(defn meta-mutate
     "Function that takes the previous generation's structure as input makes 
     several copies, then applies a recursive meta mutation on all copies and composes them together by fitting
     them in a higher order structure with a glue and a higher-order prefix-sequence"
+    [structure]
     (let [times (repetitions structure)
           original structure]
         (loop [remaining times 

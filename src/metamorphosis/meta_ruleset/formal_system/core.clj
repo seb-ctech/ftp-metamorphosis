@@ -13,15 +13,18 @@
 ; PROPERTY: Some property that the next units will have
 ; AMOUNT: Some amount that either the next Unit, Transform or Property will have. Default is "0"
 
-(def alphabet [:unit :transform :property :amount])
+(def alphabet [:unit :transform :property])
 
-(defn random-entry []
+(defn random-entry 
+    "A function that returns a random entry from the alphabet"
+    []
     {:class (get alphabet 
                  (rand-int (count alphabet)))
      :index (rand-int 5)})
 
-(defn build-axiom [sequence]
+(defn build-axiom
     "Function that builds an axiom out of a sequence by appending gen 0"
+    [sequence]
     {:gen 0 :sequence sequence})
 
 (defn glue 
@@ -31,16 +34,21 @@
     ([n i]
         {:class :glue :values (list n i)}))
 
-(defn build-command-pair [class index amount]
+(defn build-command-pair
+    "A function that returns a AMOUNT-COMMAND pair"
+    [class index amount]
     (list {:class :amount :index amount}
           {:class class :index index}))
 
-(defn read-command-pair [pair]
+(defn read-command-pair 
+    "A function that takes a AMOUNT-COMMAND pair and returns the values"
+    [pair]
     {:class (:class (second pair))
         :index (:index (second pair))
         :amount (:index (first pair))})
 
-(defn build-random-axiom 
+(defn build-random-axiom
+    "A function that build a random axiom"
     ([]
         (build-random-axiom (+ (rand-int 6) 3)))
     ([length]
@@ -50,17 +58,24 @@
                             (random-entry)))
                  (build-axiom sequence)))))
 
-(defn command-class? [class entry]
+(defn command-class? 
+    "A function that returns true or false wether the provided command is of the requested type"
+    [class entry]
     (= (:class entry) class))
 
-(defn has-lower-level? [entry]
+(defn has-lower-level?
     "A function that returns true of false, wether an entry has a lower-level sequence"
+    [entry]
     (contains? entry :sequence))
 
-(defn has-sub-seq? [sequence]
+(defn has-sub-seq? 
+    "A function which checks if the current sequence has any sub-sequences"
+    [sequence]
     (some has-lower-level? sequence))
 
-(defn count-copies [sequence]
+(defn count-copies 
+    "A function that counts the amount of sub-sequences within a sequence"
+    [sequence]
     (count (filter has-lower-level? sequence)))
 
 (defn split-scopes 

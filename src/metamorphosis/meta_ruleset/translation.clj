@@ -1,7 +1,6 @@
 (ns metamorphosis.meta-ruleset.translation
     (:require [metamorphosis.event-listener.input.core :as in]))
 
-(def test-input in/test-input)
 (def input-signals in/input-signals)
 
 (defn get-entry-position 
@@ -64,11 +63,16 @@
                     (recur (rest remaining) amount (conj instructions (formal-system->form next instruction-set amount)))))
             instructions)))
 
-(defn evaluate-break [signal]
-    (or (not= (:signal signal) :break)(> (float (:duration signal)) 0.001)))
+(defn evaluate-break 
+    "A function that returns true when the signal is not a break or a break that is longer than a threshhold.
+    Used to clean noisy input"
+    [signal]
+    (let [threshhold 0.001]
+        (or (not= (:signal signal) :break)
+            (> (float (:duration signal)) threshhold))))
 
 (defn translate-input-signal 
-    "A function that translates a single signal from the input to class and index"
+    "A function that translates a single signal from the input sequence to command class and index"
     [input index unit?]
         (let [amount (int (* (float (:duration input)) 10 3))]
             (conj
@@ -80,9 +84,10 @@
                                 :transform))
                 :index (get-entry-position input-signals (:signal input))})))
 
-(defn process-input [input] 
+(defn process-input
     "A function that takes an abstract input sequence 
-    and transforms it into an initital motif for the meta-formal-system"
+    and transforms it into an initital axiom for the meta-formal-system"
+    [input] 
     (let [input-seq (filter evaluate-break input)]
         (loop [group []
                remaining input-seq

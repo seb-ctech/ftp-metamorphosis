@@ -5,23 +5,27 @@
             [metamorphosis.meta-ruleset.core :as msys])
   (:gen-class))
 
+;=== PROGRAM SETTINGS =================
+
 (def resolution [1000 1000])
 (def evolving-interval 10)
 (def max-generations 4)
+
+;======================================
 
 (defn init 
   "Function that sets the initial state for the program"
   []
   (let [state (gsys/setup-sketch)]
-    (assoc  state :time {
-                    :count 0 
-                    :target evolving-interval}
-            :last-gen 0
-            :input-sequence []
-            :max-gen max-generations)))
+    (assoc state 
+      :time {
+        :count 0 
+        :target evolving-interval}
+      :input-sequence []
+      :max-gen max-generations)))
 
 (defn metamorph-loop
-  "The main program loop which functions as wrapper for the three main systems: 
+  "The main program loop which functions as wrapper for the three sub-systems: 
   Event-listener, Meta-Evolving Formal System and Graphical Translation"
   [state]
     (let [state (-> state

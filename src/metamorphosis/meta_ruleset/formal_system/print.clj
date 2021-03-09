@@ -7,7 +7,8 @@
 
 (def next-entry " -> ")
 
-(defn top-level-generation 
+(defn top-level-generation
+    "A function that prints the header in form of the top-level generation"
     ([generation]
         (str "\n" "Generation" " " generation "\n" long-separator "\n"))
     ([generation repetitions]
@@ -18,10 +19,14 @@
             ")" "\n" long-separator "\n")))
 
 
-(defn nested-prefix [top current]
+(defn nested-prefix 
+    "A function that returns the necessary indentation by nesting level"
+    [top current]
     (apply str (repeat (- top current) "\t")))
 
-(defn gen-variation [top current variation]
+(defn gen-variation 
+    "A function that prints a sub header for the current copy within a generation"
+    [top current variation]
     (str 
         (if (= (:type variation) :original)
             "O | Original"
@@ -36,7 +41,9 @@
                 ""))
         ")" "\n" ))
 
-(defn command->string [amount command]
+(defn command->string 
+    "A function that converts a command class to a printable name"
+    [amount command]
     (str (case (:class command)
                 :transform "TRANS"
                 :property "PROP"
@@ -51,7 +58,9 @@
           ")"))
 
 
-(defn sequence->string [sequence]
+(defn sequence->string 
+    "A function that prints a sequence in a readable format"
+    [sequence]
     (let [groups (partition 2 (filter #(not (= (:class %) :glue)) sequence))
           last (dec (count groups))]
         (apply str (map-indexed (fn [i entry] 
@@ -63,10 +72,15 @@
                                                 "")))) 
                       groups))))
 
-(defn get-repetitions [sequence]
+;FIXME: Is a separate function to avoid a dependency cycle with core
+(defn get-repetitions 
+    "A function that reads the glue of a sequence to get the amount of copies."
+    [sequence]
     (first (:values (first sequence))))
 
-(defn recursive-sequence [top current sequence]
+(defn recursive-sequence 
+    "A function that recursively prints nested sequence structures"
+    [top current sequence]
     (loop [prefix []
            remaining sequence
            index 0
