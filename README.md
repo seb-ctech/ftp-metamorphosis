@@ -1,15 +1,26 @@
-# metamorphosis
+# Metamorphosis
 
-An Artistic installation that explores themes of Reproduction (Like the on of DNA), motific evolution and the meaning of "Meta" and self-referential behavior in Art and Programming.
+An Artistic installation that explores themes of reproduction (Like the one of DNA), motific evolution and the meaning of "Meta" and self-referential behavior in algorithmic art.
 
 ## Usage
 
-1. REPL - run `(require 'metamorphosis.core :reload-all)`.
-    - Then "eval and show result" the "draw-state" function.
+Download and unzip this [archive](https://drive.google.com/file/d/10uyWhCL2uLZyRV_Dox1hj3GJaxmE-w-E/view?usp=sharing)
 
-2. (use 'metamorphosis.core :reload-all true)
+* Enter new Input sequence with "QWERT" keys
+* Wait for the system to progress through the generations
+* Review the results in the "resources/results" folder
+* You can interrupt an ongoing generation by providing a new input, however this might take a while from GEN 3 upwards
 
-3. (clojure.main/main "-m" 'metamorphosis.core)
+### With Clojure and Leiningen:
+
+From the REPL - run 
+
+1. `(require 'metamorphosis.core :reload-all)`.
+    - Then `(-main)`.
+
+2. `(use 'metamorphosis.core :reload-all true)`
+
+3. `(clojure.main/main "-m" 'metamorphosis.core)`
 
 ## License
 
@@ -17,4 +28,5 @@ Copyright © 2021 Sebastian Wilhelm, Filmuniversität KONRAD WOLF
 
 ## Disclaimer
 
-This Project makes use of [ohpauleez's](https://github.com/ohpauleez/clojure-leap) leap-motion wrapper for clojure. 
+This Project makes use of [ohpauleez's](https://github.com/ohpauleez/clojure-leap) leap-motion wrapper for clojure.
+But it is not implemented yet! 

@@ -19,13 +19,13 @@
 ;==== TEST FUNCTIONS ======
 
 (defn motif->phrase []
-    (next-step (f/build-random-axiom)))
+    (evolve-next-generation (f/build-random-axiom)))
 
 (defn motif->passage []
-    (next-step (motif->phrase)))
+    (evolve-next-generation (motif->phrase)))
 
 (defn motif->movement []
-    (next-step (motif->passage)))
+    (evolve-next-generation (motif->passage)))
 
 (defn motif->final []
-    (next-step (motif->movement)))
+    (evolve-next-generation (motif->movement)))
