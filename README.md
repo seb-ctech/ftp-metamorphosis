@@ -5,7 +5,7 @@ It is a framework/interactive program that explores themes of reproduction, moti
 
 ## Usage
 
-Download and unzip this [archive](https://gofile.io/d/WViu7C)
+Download and unzip this [archive](https://drive.google.com/file/d/1mlfVL8iEI_4t0gcK-hLLWkTH0OeMvuXJ/view?usp=sharing)
 Run the ".jar" as executable or via "java -jar <filename>" within the folder. 
 *The program needs the "resources" folder to operate correctly.*
 
